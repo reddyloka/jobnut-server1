@@ -131,8 +131,8 @@ router.post('/hr', (req, res) => {
     if(req.body.isApplicant) {
         let applicant = new Applicant();
         const user_details = JSON.parse(JSON.stringify(req.body))
-        applicant.fname = user_details.fname;
-        applicant.lname = user_details.lname;
+        applicant.firstName = user_details.firstName;
+        applicant.lastName = user_details.lastName;
         applicant.isApplicant = user_details.isApplicant;
         applicant.status = user_details.status;
         applicant.isHr = user_details.isHr;
