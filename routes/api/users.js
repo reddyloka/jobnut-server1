@@ -142,16 +142,10 @@ router.post('/hr', (req, res) => {
     // res.cookie("SESSIONID", jwtBearerToken, {httpOnly:true, secure:true});
     console.log('chello', req.body);
     if (req.body.isApplicant) {
-        let applicant = new Applicant();
         const user_details = JSON.parse(JSON.stringify(req.body))
-        applicant.fname = user_details.fname;
-        applicant.lname = user_details.lname;
-        applicant.isApplicant = user_details.isApplicant;
-        applicant.status = user_details.status;
-        applicant.isHr = user_details.isHr;
-        applicant.email = user_details.email,
-            applicant.encryptPassword(user_details.password);
-
+        let applicant = new Applicant(user_details);
+        applicant.encryptPassword(user_details.password);
+        applicant.isApplicant = false;
         applicant.save().then(() => {
             return res.json({
                 applicant: applicant.toProfileJSONFor()
@@ -159,16 +153,9 @@ router.post('/hr', (req, res) => {
         }).catch();
 
     } else if (req.body.isHr) {
-        let hr = new Hr();
         const user_details = JSON.parse(JSON.stringify(req.body))
-        hr.fname = user_details.fname;
-        hr.lname = user_details.lname;
-        hr.isHr = user_details.isHr;
-        hr.status = user_details.status;
-        hr.isApplicant = user_details.isApplicant;
-        hr.email = user_details.email,
-            hr.encryptPassword(user_details.password);
-
+        let hr = new Hr(user_details);
+        hr.encryptPassword(user_details.password);
         hr.save().then(() => {
             return res.json({
                 hr: hr.toProfileJSONFor()

@@ -24,12 +24,12 @@ const postSchema = new Schema({
     selectionProcedure: String,
     hrRef : {
         type: Schema.Types.ObjectId,
-        ref: 'hrModelObj'
+        ref: 'hrModel'
     },
     applicants: [
         {
             type: Schema.Types.ObjectId,
-            ref: 'applicantModelObj'
+            ref: 'applicantModel'
         }
     ]
 }, {timestamps: true});

@@ -12,6 +12,12 @@ const hrSchema = new Schema({
     lname: String,
     email: String,
     hash: String,
+    industry: String,
+    designation: String,
+    address: String,
+    country: String,
+    state: String,
+    city: String,
     admin: {
         type: Boolean,
         default: false
@@ -27,11 +33,7 @@ const hrSchema = new Schema({
     status: {
         type: Boolean,
         default: false
-    },
-    jobsPost: [{
-        type: Schema.Types.ObjectId,
-        ref: 'postModel'
-    }]
+    }
 });
 
 hrSchema.plugin(uniqueValidator, { message: 'is already taken '});
