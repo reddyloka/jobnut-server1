@@ -11,7 +11,7 @@ const hrSchema = new Schema({
     fname: String,
     lname: String,
     email: String,
-    password: String,
+    hash: String,
     admin: {
         type: Boolean,
         default: false
@@ -28,7 +28,10 @@ const hrSchema = new Schema({
         type: Boolean,
         default: false
     },
-    jobsPost: []
+    jobsPost: [{
+        type: Schema.Types.ObjectId,
+        ref: 'postModel'
+    }]
 });
 
 hrSchema.plugin(uniqueValidator, { message: 'is already taken '});
@@ -63,7 +66,10 @@ hrSchema.methods.generateJWT = function() {
 
 hrSchema.methods.toAuthJSON = function() {
     return {
-        email: this.email,
+        id: this._id,
+        isHr: this.isHr,
+        isApplicant: this.isApplicant,
+        status: this.status,
         token: this.generateJWT()
     };
 };
@@ -103,4 +109,4 @@ hrSchema.methods.toProfileJSONFor = function(hr){
 
 // }
 
-mongoose.model('hrModel', hrSchema);
+let hrModel = mongoose.model('hrModel', hrSchema);

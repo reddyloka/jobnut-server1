@@ -30,7 +30,10 @@ const applicantSchema = new Schema({
         type: Boolean,
         default: false
     },
-    jobApplied: []
+    jobApplied: [{
+        type: Schema.Types.ObjectId,
+        ref: 'postModel'
+    }]
 });
 
 applicantSchema.plugin(uniqueValidator, { message: 'is already taken '});
@@ -60,7 +63,10 @@ applicantSchema.methods.generateJWT = function() {
 
 applicantSchema.methods.toAuthJSON = function() {
     return {
-        email: this.email,
+        id: this._id,
+        isHr: this.isHr,
+        isApplicant: this.isApplicant,
+        status: this.status,
         token: this.generateJWT()
     };
 };
@@ -73,4 +79,4 @@ applicantSchema.methods.toProfileJSONFor = function(hr){
     }
 }
 
-mongoose.model('applicantModel', applicantSchema);
+let applicantModel = mongoose.model('applicantModel', applicantSchema);
