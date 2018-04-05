@@ -10,63 +10,76 @@ router.get('/hrs', (req, res, next) => {
     // console.log('game over',req);    
     user_details = JSON.parse(JSON.stringify(req.body));
     // if (user_details.isHr && user_details.status) {
-        Hr.find().then((user) => {
-            // if (!user) {
-            //     return res.sendStatus(401);
-            // }
-            return res.json({
-                user: user
-            });
-        }).catch(next);
+    Hr.find().then((user) => {
+        // if (!user) {
+        //     return res.sendStatus(401);
+        // }
+        return res.json(user.toProfileJSONFor());
+    }).catch(next);
     // }
 });
 
 router.get('/users', (req, res, next) => {
     user_details = JSON.parse(JSON.stringify(req.body));
     // if (user_details.isHr && user_details.status) {
-        Applicant.find().then((user) => {
-            if (!user) {
-                return res.sendStatus(401);
-            }
-            return res.json({
-                user: user
-            });
-        }).catch(next);
+    Applicant.find().then((user) => {
+        if (!user) {
+            return res.sendStatus(401);
+        }
+        return res.json(user.toProfileJSONFor());
+    }).catch(next);
     // }
 });
 router.post('/login', (req, res, next) => {
-    
+
     user_details = JSON.parse(JSON.stringify(req.body));
-    console.log('game over',user_details);    
-    if(!req.body.username) {
+    console.log('game over', user_details);
+    if (!req.body.username) {
         return res.status(422).json({
+            success: false,
             errors: {
                 email: 'can\'t be blank'
             }
         })
     }
 
-    if(!req.body.password) {
+    if (!req.body.password) {
         return res.status(422).json({
+            success: false,
             errors: {
                 password: 'can\'t be blank'
             }
         })
     }
     if (user_details.isHr) {
-        Hr.findOne({email: user_details.username}).then((user) => {
+        Hr.findOne({
+            email: user_details.username
+        }).then((user) => {
             if (!user) {
-                return res.sendStatus(401);
+                return res.status(401).json({
+                    success: false,
+                    errors: {
+                        message: 'Sign Up First!'
+                    }
+                });
             }
             return res.json({
                 user: user.toAuthJSON()
             });
         }).catch(next);
     } else {
-        Applicant.findOne({email: user_details.username}).then((user)=> {
-            console.log(' ❌', user,user_details.username)
+        Applicant.findOne({
+            email: user_details.username
+        }).then((user) => {
+            console.log(' ❌', user, user_details.username)
             if (!user) {
-                return res.sendStatus(401);
+                return res.status(401).json({
+                    success: false,
+                    errors: {
+                        message: 'Sign Up First!'
+                    }
+
+                });
             }
             return res.json({
                 user: user.toAuthJSON()
@@ -128,35 +141,22 @@ router.get('/user', (req, res, next) => {
 router.post('/hr', (req, res) => {
     // res.cookie("SESSIONID", jwtBearerToken, {httpOnly:true, secure:true});
     console.log('chello', req.body);
-    if(req.body.isApplicant) {
-        let applicant = new Applicant();
+    if (req.body.isApplicant) {
         const user_details = JSON.parse(JSON.stringify(req.body))
-        applicant.firstName = user_details.firstName;
-        applicant.lastName = user_details.lastName;
-        applicant.isApplicant = user_details.isApplicant;
-        applicant.status = user_details.status;
-        applicant.isHr = user_details.isHr;
-        applicant.email = user_details.email,
+        let applicant = new Applicant(user_details);
         applicant.encryptPassword(user_details.password);
-    
-        applicant.save().then(()=>{
+        applicant.isApplicant = false;
+        applicant.save().then(() => {
             return res.json({
                 applicant: applicant.toProfileJSONFor()
             });
         }).catch();
 
-    } else if (req.body.isHr){
-        let hr = new Hr();
+    } else if (req.body.isHr) {
         const user_details = JSON.parse(JSON.stringify(req.body))
-        hr.fname = user_details.fname;
-        hr.lname = user_details.lname;
-        hr.isHr = user_details.isHr;
-        hr.status = user_details.status;
-        hr.isApplicant = user_details.isApplicant;
-        hr.email = user_details.email,
+        let hr = new Hr(user_details);
         hr.encryptPassword(user_details.password);
-    
-        hr.save().then(()=>{
+        hr.save().then(() => {
             return res.json({
                 hr: hr.toProfileJSONFor()
             });
@@ -221,7 +221,7 @@ router.get('/v1/posts/:post_id', (req, res) => {
     })
 })
 
-router.put('/v1/posts', (req, res) => {
+router.put('/posts', (req, res) => {
     var post_details_to_add = JSON.parse(JSON.stringify(req.body));
     postModelObj = new postModel(post_details_to_add);
     addNewPost(postModelObj);

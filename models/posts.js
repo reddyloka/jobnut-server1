@@ -23,13 +23,13 @@ const postSchema = new Schema({
     ResourcePersonContact: String,
     selectionProcedure: String,
     hrRef : {
-        hrId: Schema.Types.ObjectId,
-        ref: ['hrModelObj']
+        type: Schema.Types.ObjectId,
+        ref: 'hrModel'
     },
     applicants: [
         {
-            applicantId: Schema.Types.ObjectId,
-            ref: ['applicantModelObj']
+            type: Schema.Types.ObjectId,
+            ref: 'applicantModel'
         }
     ]
 }, {timestamps: true});
@@ -56,4 +56,4 @@ postSchema.methods.toJSONFor = function(user) {
     }
 }
 
-mongoose.model('postModel', postSchema);
+let postModel = mongoose.model('postModel', postSchema);
