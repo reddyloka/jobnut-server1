@@ -12,7 +12,7 @@ const postSchema = new Schema({
     enddate: Date,
     skills: String,
     location: String,
-    salary: Number,
+    salary: String,
     experinece: String,
     dateOfJoining: Date,
     extraRequirement: String,

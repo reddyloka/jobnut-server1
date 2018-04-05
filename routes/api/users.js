@@ -145,7 +145,7 @@ router.post('/hr', (req, res) => {
         const user_details = JSON.parse(JSON.stringify(req.body))
         let applicant = new Applicant(user_details);
         applicant.encryptPassword(user_details.password);
-        applicant.isApplicant = false;
+        // applicant.isApplicant = false;
         applicant.save().then(() => {
             return res.json({
                 applicant: applicant.toProfileJSONFor()
