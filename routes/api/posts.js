@@ -37,17 +37,16 @@ router.put('/new-post', (req, res, next) => {
     console.log('new post', req.body, req.query.id);
     // let post = new Post();
     const post_details = JSON.parse(JSON.stringify(req.body));
-    Hr.findById(req.query.id).then((user) => {
-        console.log('user is ',user);
-        const post = new Post(post_details)
-        user.jobsPost.push(post._id);
-        post.hrRef = user;
-        return post.save().then(() => {
+    // Hr.findById(req.query.id).then((user) => {
+        // console.log('user is ',user);
+        const post = new Post(post_details);
+        // post.hrRef = user;
+        return post.save().populate('hrRef').then(() => {
             return res.json({
                 data: post.toJSONFor(req.query.id)
             })
         })
-    })
+    // })
     // post.title = post_details.title;
     // post.companyname = post_details.companyname;
     // post.description = post_details.description;
