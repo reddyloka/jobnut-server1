@@ -26,7 +26,7 @@ router.get('/users', (req, res, next) => {
         if (!user) {
             return res.sendStatus(401);
         }
-        return res.json(user.toProfileJSONFor());
+        return res.json(user);
     }).catch(next);
     // }
 });

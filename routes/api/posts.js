@@ -33,6 +33,7 @@ router.get('/', (req, res, next) => {
     // }
 });
 
+
 router.put('/new-post', (req, res, next) => {
     console.log('new post', req.body, req.query.id);
     // let post = new Post();

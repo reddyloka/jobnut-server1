@@ -71,11 +71,12 @@ applicantSchema.methods.toAuthJSON = function() {
     };
 };
 
-applicantSchema.methods.toProfileJSONFor = function(hr){
+applicantSchema.methods.toProfileJSONFor = function(){
     return {
         email: this.email,
         fname: this.fname,
-        lname: this.lname
+        lname: this.lname,
+        dob: this.dob
     }
 }
 
