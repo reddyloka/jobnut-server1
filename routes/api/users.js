@@ -19,17 +19,20 @@ router.get('/hrs', (req, res, next) => {
     // }
 });
 
+
 router.get('/users', (req, res, next) => {
-    user_details = JSON.parse(JSON.stringify(req.body));
+   console.log(req.query.id);
     // if (user_details.isHr && user_details.status) {
-    Applicant.find().then((user) => {
-        if (!user) {
+    Applicant.findById(req.query.id).then((user) => {
+        if (!user){
             return res.sendStatus(401);
         }
-        return res.json(user.toProfileJSONFor());
+        return res.json(user);
     }).catch(next);
+    
     // }
 });
+
 router.post('/login', (req, res, next) => {
 
     user_details = JSON.parse(JSON.stringify(req.body));

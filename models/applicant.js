@@ -14,9 +14,12 @@ const applicantSchema = new Schema({
     hash: String,
     dob: Date,
     phone: String,
+    location: String,
+    address: String,
+    gender: String,
     education:[],
     experience:[],
-    skillValue: String,
+    skillValue: Array,
 
     admin: {
         type: Boolean,
@@ -75,7 +78,7 @@ applicantSchema.methods.toAuthJSON = function() {
     };
 };
 
-applicantSchema.methods.toProfileJSONFor = function(hr){
+applicantSchema.methods.toProfileJSONFor = function(){
     return {
         firstName: this.firstName,
         lastName: this.lastName,
