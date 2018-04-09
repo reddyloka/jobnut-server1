@@ -6,16 +6,25 @@ var auth = require('../auth');
 
 // const app = express();
 
-router.get('/hrs', (req, res, next) => {
-    // console.log('game over',req);    
-    user_details = JSON.parse(JSON.stringify(req.body));
-    // if (user_details.isHr && user_details.status) {
-    Hr.find().then((user) => {
-        // if (!user) {
-        //     return res.sendStatus(401);
-        // }
-        return res.json(user.toProfileJSONFor());
-    }).catch(next);
+router.get('/hrs', async (req, res, next) => {
+
+    console.log('data from hr')
+  try{
+      console.log('data from hr',req.query.id)
+    const user = await Hr.findById(req.query.id)
+    if(!user){
+        return res.status(401).json({
+            success:false,
+            errors:{
+                message:'User Doesn\'t Exist !'
+            }
+        })
+    }
+    return res.json(user);
+  } catch(e){
+      console.log("data from the hr details",e);
+  }
+ 
     // }
 });
 

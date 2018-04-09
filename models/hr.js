@@ -18,6 +18,9 @@ const hrSchema = new Schema({
     country: String,
     state: String,
     city: String,
+    phone: String,
+    skillValue: Array,
+    jobProfile: String,
     admin: {
         type: Boolean,
         default: false
