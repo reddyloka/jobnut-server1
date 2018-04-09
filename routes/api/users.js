@@ -28,6 +28,19 @@ router.get('/hrs', async (req, res, next) => {
     // }
 });
 
+router.put('/users/update', async (req, res, next) => {
+    console.log("upadted AAAAAAAAAAA",req.query.id)
+    const data = await Applicant.findByIdAndUpdate(req.query.id, req.body)
+    if(!data){
+        // eror
+    }
+    return res.json(
+        {
+            data: data
+        }
+    )
+ });
+
 
 router.get('/users', (req, res, next) => {
    console.log(req.query.id);
@@ -41,6 +54,8 @@ router.get('/users', (req, res, next) => {
     
     // }
 });
+
+
 
 router.post('/login', (req, res, next) => {
 
