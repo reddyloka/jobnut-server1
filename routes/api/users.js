@@ -3,35 +3,46 @@ var router = require('express').Router();
 var Hr = mongoose.model('hrModel');
 var Applicant = mongoose.model('applicantModel');
 var auth = require('../auth');
+// const authenticate = require('../../_middleware/check-auth');
 
 // const app = express();
+function send_failure(code, message) {
+    return status(code).json({
+        success: false,
+        errors: {
+            message
+        }
+    })
+}
 
-router.get('/hrs', (req, res, next) => {
-    // console.log('game over',req);    
-    user_details = JSON.parse(JSON.stringify(req.body));
-    // if (user_details.isHr && user_details.status) {
-    Hr.find().then((user) => {
-        // if (!user) {
-        //     return res.sendStatus(401);
-        // }
-        return res.json(user.toProfileJSONFor());
-    }).catch(next);
-    // }
-});
-
-router.get('/users', (req, res, next) => {
-    user_details = JSON.parse(JSON.stringify(req.body));
-    // if (user_details.isHr && user_details.status) {
-    Applicant.find().then((user) => {
+router.get('/hrs', async (req, res, next) => {
+    try {
+        user_details = JSON.parse(JSON.stringify(req.body));
+        const user = await Hr.find()
         if (!user) {
-            return res.sendStatus(401);
+            return res.send_failure(401, 'User Doesn\'t Exist!');
         }
         return res.json(user);
-    }).catch(next);
-    // }
+    } catch (error) {
+        console.log('Some Other Error occured: ', error);
+    }
 });
-router.post('/login', (req, res, next) => {
 
+
+router.get('/users', async (req, res, next) => {
+    console.log(req.query.id);
+    try {
+        const user = await Applicant.findById(req.query.id);
+        if (!user) {
+            return res.send_failure(401, 'User Doesn\'t Exist!');
+        }
+        return res.json(user);
+    } catch (error) {
+        console.log('Some Other Error occured: ', error);
+    }
+});
+
+router.post('/login', (req, res, next) => {
     user_details = JSON.parse(JSON.stringify(req.body));
     console.log('game over', user_details);
     if (!req.body.username) {
@@ -145,7 +156,7 @@ router.post('/hr', (req, res) => {
         const user_details = JSON.parse(JSON.stringify(req.body))
         let applicant = new Applicant(user_details);
         applicant.encryptPassword(user_details.password);
-        applicant.isApplicant = false;
+        // applicant.isApplicant = false;
         applicant.save().then(() => {
             return res.json({
                 applicant: applicant.toProfileJSONFor()
@@ -221,7 +232,7 @@ router.get('/v1/posts/:post_id', (req, res) => {
     })
 })
 
-router.put('/v1/posts', (req, res) => {
+router.put('/posts', (req, res) => {
     var post_details_to_add = JSON.parse(JSON.stringify(req.body));
     postModelObj = new postModel(post_details_to_add);
     addNewPost(postModelObj);

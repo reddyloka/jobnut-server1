@@ -1,9 +1,13 @@
 const jwt = require('jsonwebtoken');
+var secret = require('../config').secret;
 
-module.exports = (req, res, next) => {
-    try{
-        const decoded = jwt.verify(req.body.token, key);
+var authenticate = (req, res, next) => {
+    try {
+        const token = req.body.token;
+        console.log('body is: ', req.query.token);
+        const decoded = jwt.verify(req.query.token, secret);
         req.userData = decoded;
+        // await console.log('DECODEDS is: ', jwt.verify(req.query.token, secret));
         next()
     } catch (error) {
         return res.status(401).json({
@@ -11,3 +15,5 @@ module.exports = (req, res, next) => {
         });
     }
 }
+
+module.exports = authenticate;

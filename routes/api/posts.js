@@ -3,12 +3,14 @@ var router = require('express').Router();
 var Post = mongoose.model('postModel');
 const Hr = mongoose.model('hrModel');
 var auth = require('../auth');
+// const { authenticate } = require('../../_middleware/check-auth');
 
-router.get('/:post_id', (req, res, next) => {
-    console.log('game over posts ');
-    user_details = JSON.parse(JSON.stringify(req.body));
-    // if (user_details.isHr && user_details.status) {
-        Post.findOne({_id: req.params.post_id}).then((user) => {
+
+router.get('/all/post', (req, res, next) => {
+    // user_details = JSON.parse(JSON.stringify(req.body));
+//   console.log('dffgfgfgffgfhhg');
+  
+        Post.find().then((user) => {
             if (!user) {
                 return res.sendStatus(401);
             }
@@ -18,6 +20,24 @@ router.get('/:post_id', (req, res, next) => {
         }).catch(next);
     // }
 });
+
+router.get('/:post_id', (req, res, next) => {
+    console.log('game over posts ');
+    user_details = JSON.parse(JSON.stringify(req.body));
+    // if (user_details.isHr && user_details.status) {
+        Post.findOne({_id: req.params.post_id}).then((user) => {
+            console.log(user);
+            
+            if (!user) {
+                return res.sendStatus(401);
+            }
+            return res.json( {
+                data: user
+            } );
+        }).catch(next);
+    // }
+});
+
 router.get('/', (req, res, next) => {
     console.log('game over posts:: ', req.query.id)
     user_details = JSON.parse(JSON.stringify(req.body));
@@ -26,28 +46,35 @@ router.get('/', (req, res, next) => {
             if (!user) {
                 return res.sendStatus(401);
             }
-            return res.json( {
+            return res.json({
                 data: user
-            } );
+            });
         }).catch(next);
     // }
 });
 
 
-router.put('/new-post', (req, res, next) => {
-    console.log('new post', req.body, req.query.id);
+router.put('/new-post', auth, (req, res, next) => {
+    console.log('new post', req.userData);
     // let post = new Post();
     const post_details = JSON.parse(JSON.stringify(req.body));
-    // Hr.findById(req.query.id).then((user) => {
-        // console.log('user is ',user);
-        const post = new Post(post_details);
-        // post.hrRef = user;
-        return post.save().populate('hrRef').then(() => {
+    
+    Hr.findById(req.query.id).then((user) => {
+        console.log('user is ',user);
+        const post = new Post(post_details)
+        post.hrRef = user;
+        console.log("postPPPPPPP",post);
+        return post.save().then(() => {
             return res.json({
                 data: post.toJSONFor(req.query.id)
             })
         })
-    // })
+    })
+
+
+
+    
+   
     // post.title = post_details.title;
     // post.companyname = post_details.companyname;
     // post.description = post_details.description;
@@ -72,6 +99,7 @@ router.put('/new-post', (req, res, next) => {
     //     });
     // }).catch();
 });
+
 
 
 

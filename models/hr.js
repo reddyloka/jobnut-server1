@@ -10,8 +10,14 @@ const Schema = mongoose.Schema;
 const hrSchema = new Schema({
     fname: String,
     lname: String,
-    email: String,
-    hash: String,
+    email: {
+        type: String,
+        // unique: true
+    },
+    hash: {
+        type: String,
+        // unique: true
+    },
     industry: String,
     designation: String,
     address: String,
@@ -36,13 +42,15 @@ const hrSchema = new Schema({
     }
 });
 
-hrSchema.plugin(uniqueValidator, { message: 'is already taken '});
+hrSchema.plugin(uniqueValidator, {
+    message: 'is already taken '
+});
 
-hrSchema.methods.encryptPassword = function(key) {
-    bcrypt.hash(key, saltRounds).then((hash)=> {
-        console.log(' ❌',this.jobsPost)
-        setTimeout(()=>{
-            console.log(' ❌',this.jobsPost)
+hrSchema.methods.encryptPassword = function (key) {
+    bcrypt.hash(key, saltRounds).then((hash) => {
+        console.log(' ❌', this.jobsPost)
+        setTimeout(() => {
+            console.log(' ❌', this.jobsPost)
         }, 5000)
         return this.password = hash;
     });
@@ -54,10 +62,10 @@ hrSchema.methods.decryptPassword = function (key) {
     return bcrypt.compare(key, this.hash);
 }
 
-hrSchema.methods.generateJWT = function() {
+hrSchema.methods.generateJWT = function () {
     let today = new Date();
     let exp = new Date(today);
-    exp.setDate(today.getDate()+60);
+    exp.setDate(today.getDate() + 60);
 
     return jwt.sign({
         id: this._id,
@@ -66,7 +74,7 @@ hrSchema.methods.generateJWT = function() {
     }, secret);
 };
 
-hrSchema.methods.toAuthJSON = function() {
+hrSchema.methods.toAuthJSON = function () {
     return {
         id: this._id,
         isHr: this.isHr,
@@ -76,7 +84,7 @@ hrSchema.methods.toAuthJSON = function() {
     };
 };
 
-hrSchema.methods.toProfileJSONFor = function(hr){
+hrSchema.methods.toProfileJSONFor = function (hr) {
     return {
         email: this.email,
         fname: this.fname,
