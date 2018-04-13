@@ -10,7 +10,7 @@ const postSchema = new Schema({
     description: String,
     startdate: Date,
     enddate: Date,
-    skills: String,
+    skills: Array,
     location: String,
     salary: String,
     experinece: String,

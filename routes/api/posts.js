@@ -2,6 +2,7 @@ var mongoose = require('mongoose');
 var router = require('express').Router();
 var Post = mongoose.model('postModel');
 const Hr = mongoose.model('hrModel');
+var Applicant = mongoose.model('applicantModel');
 var auth = require('../auth');
 
 
@@ -20,26 +21,56 @@ router.get('/all/post', (req, res, next) => {
     // }
 });
 
+
+// router.get('/applieddetails',  async (req, res, next) => {
+//     console.log('game over posts:: ', req.query.id)
+//       const data=  await Post.findById(req.query.id).populate(
+//           {
+//               path:'applicants',
+//               match: {
+//                   firstName: { $gte: 'Gopi'}
+//               }
+//             }
+//         ).populate('hrRef')
+//             if (!data) {
+//                 return res.sendStatus(401);
+//             }else{
+//         //         data.applicants.map((ele)=>{
+//         //      Applicant.findById(ele).then((user) => {
+//         //     if(user){
+//         //         return res.json({
+//         //         data: user
+//         //     });
+//         //     }
+//         // })
+//         // })
+//         return res.json({
+//                     data
+//                 });
+//         }
+
+// });
+
 router.get('/:post_id', (req, res, next) => {
     console.log('game over posts ');
-    user_details = JSON.parse(JSON.stringify(req.body));
+    // user_details = JSON.parse(JSON.stringify(req.body));
     // if (user_details.isHr && user_details.status) {
-        Post.findOne({_id: req.params.post_id}).then((user) => {
+        Post.findOne({_id: req.params.post_id}).populate('applicants').then((user) => {
             if (!user) {
                 return res.sendStatus(401);
             }
             return res.json( {
                 data: user
-            } );
+            });
         }).catch(next);
     // }
 });
 
 router.get('/', (req, res, next) => {
-    console.log('game over posts:: ', req.query.id)
-    user_details = JSON.parse(JSON.stringify(req.body));
+    console.log('game over posts:: ', req.query.hrRef)
+    // user_details = JSON.parse(JSON.stringify(req.body));
     // if (user_details.isHr && user_details.status) {
-        Post.find({hrRef: req.query.id}).populate('hrRef').then((user) => {
+        Post.find({hrRef: req.query.hrRef}).then((user) => {
             if (!user) {
                 return res.sendStatus(401);
             }

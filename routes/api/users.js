@@ -3,6 +3,7 @@ var router = require('express').Router();
 var Hr = mongoose.model('hrModel');
 var Applicant = mongoose.model('applicantModel');
 var auth = require('../auth');
+var Post = mongoose.model('postModel');
 
 // const app = express();
 
@@ -28,9 +29,98 @@ router.get('/hrs', async (req, res, next) => {
     // }
 });
 
+router.put('/hrs/update', async (req, res, next) => {
+    console.log("upadted AAAAAAAAAAA",req.query.id)
+    const data = await Hr.findByIdAndUpdate(req.query.id, req.body)
+    if(!data){
+        // eror
+    }
+    return res.json(
+        {
+            data: data
+        }
+    )
+ });
+
+ router.put('/users/apply', async (req, res, next) => {
+    // console.log("upadted AAAAAAAAAAA",req.query.id)
+    // console.log("upadted AAAAAAAAAAA",req.query.hrRef)
+    const data = await Post.findById(req.query.id).then((post)=>{
+        post.applicants.push(req.query.hrRef)
+        post.save();
+
+        // post.update(
+        //     { $addToSet: { applicants: req.query.hrRef  } }
+        //  )
+    }).catch(next);
+ });
+
+ router.get('/users/appliedposts', async (req, res, next) => {
+    // console.log("upadted AAAAAAAAAAA",req.query.id)
+    // console.log("upadted AAAAAAAAAAA",req.query.hrRef)
+    const data = await Post.find({applicants: req.query.id})
+    if(!data){
+        // eror
+    }
+    return res.json(data);
+ });
+
+
+ router.put('/hrs/expUpdate', async (req, res, next) => {
+    console.log("upadted AAAAAAAAAAA",req.query.id)
+    const data = await Hr.findById(req.query.id).then((user)=> {
+        user.experience.push(req.body);
+        user.save()
+    })
+    // data.save()
+    if(!data){
+        // eror
+    }
+    return res.json(
+        {
+            data: data
+        }
+    )
+ });
+
+
 router.put('/users/update', async (req, res, next) => {
     console.log("upadted AAAAAAAAAAA",req.query.id)
     const data = await Applicant.findByIdAndUpdate(req.query.id, req.body)
+    if(!data){
+        // eror
+    }
+    return res.json(
+        {
+            data: data
+        }
+    )
+ });
+
+ router.put('/users/eduUpdate', async (req, res, next) => {
+    console.log("upadted AAAAAAAAAAA",req.query.id)
+    const data = await Applicant.findById(req.query.id).then((user)=> {
+        user.education.push(req.body);
+        user.save()
+    })
+    // data.save()
+    if(!data){
+        // eror
+    }
+    return res.json(
+        {
+            data: data
+        }
+    )
+ });
+
+ router.put('/users/expUpdate', async (req, res, next) => {
+    console.log("upadted AAAAAAAAAAA",req.query.id)
+    const data = await Applicant.findById(req.query.id).then((user)=> {
+        user.experience.push(req.body);
+        user.save()
+    })
+    // data.save()
     if(!data){
         // eror
     }
@@ -167,7 +257,7 @@ router.get('/user', (req, res, next) => {
 
 router.post('/hr', (req, res) => {
     // res.cookie("SESSIONID", jwtBearerToken, {httpOnly:true, secure:true});
-    console.log('chello', req.body);
+    // console.log('chello', req.body);
     if (req.body.isApplicant) {
         const user_details = JSON.parse(JSON.stringify(req.body))
         let applicant = new Applicant(user_details);
@@ -177,9 +267,13 @@ router.post('/hr', (req, res) => {
             return res.json({
                 applicant: applicant.toProfileJSONFor()
             });
-        }).catch();
+        }).catch(err => {
+            console.log(err);
+            
+        });
 
     } else if (req.body.isHr) {
+        console.log('chello', req.body);
         const user_details = JSON.parse(JSON.stringify(req.body))
         let hr = new Hr(user_details);
         hr.encryptPassword(user_details.password);
@@ -187,7 +281,10 @@ router.post('/hr', (req, res) => {
             return res.json({
                 hr: hr.toProfileJSONFor()
             });
-        }).catch();
+        }).catch(err => {
+            console.log(err);
+            
+        });
     }
 });
 
