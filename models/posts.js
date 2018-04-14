@@ -4,7 +4,7 @@ var jwt = require('jsonwebtoken');
 const Schema = mongoose.Schema;
 // add post Schema
 const postSchema = new Schema({
-    _jobID: Schema.Types.ObjectId,
+    // _jobID: Schema.Types.ObjectId,
     title: String,
     companyname: String,
     description: String,

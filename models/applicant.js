@@ -26,7 +26,7 @@ const applicantSchema = new Schema({
     education:[],
     experience:[],
     skillValue: Array,
-
+    profile_photo: String,
     admin: {
         type: Boolean,
         default: false
@@ -86,6 +86,8 @@ applicantSchema.methods.toAuthJSON = function() {
 
 applicantSchema.methods.toProfileJSONFor = function(){
     return {
+        isHr: this.isHr,
+        isApplicant: this.isApplicant,
         firstName: this.firstName,
         lastName: this.lastName,
         email: this.email,

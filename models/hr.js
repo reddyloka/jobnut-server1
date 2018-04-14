@@ -8,8 +8,8 @@ const saltRounds = 10;
 const Schema = mongoose.Schema;
 // add the schema
 const hrSchema = new Schema({
-    fname: String,
-    lname: String,
+    firstname: String,
+    lastname: String,
     email: {
         type: String,
         // unique: true
@@ -24,6 +24,12 @@ const hrSchema = new Schema({
     country: String,
     state: String,
     city: String,
+    phone: String,
+    skillValue: Array,
+    jobProfile: String,
+    profile_photo: {
+        type: String,
+    },
     admin: {
         type: Boolean,
         default: false
@@ -86,6 +92,9 @@ hrSchema.methods.toAuthJSON = function () {
 
 hrSchema.methods.toProfileJSONFor = function (hr) {
     return {
+        _id: this._id,
+        isHr: this.isHr,
+        isApplicant: this.isApplicant,
         email: this.email,
         fname: this.fname,
         lname: this.lname
