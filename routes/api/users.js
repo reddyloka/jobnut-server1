@@ -8,6 +8,7 @@ var Applicant = mongoose.model('applicantModel');
 var auth = require('../auth'),
     multer = require('multer');
 // const authenticate = require('../../_middleware/check-auth');
+var Post = mongoose.model('postModel');
 
 var upload = multer({ dest: 'uploads/'});
 router.use(express.static(__dirname + '/../static'));
@@ -276,12 +277,70 @@ router.get('/hrs', async (req, res, next) => {
                 }
             })
         }
-        return res.json(user);
+        return res.json({
+            success: true,
+            data: user,
+            message: ''
+        });
     } catch (e) {
         console.log("data from the hr details", e);
     }
     // }
 });
+
+router.put('/hrs/update', async (req, res, next) => {
+    console.log("upadted AAAAAAAAAAA",req.query.id)
+    const data = await Hr.findByIdAndUpdate(req.query.id, req.body)
+    if(!data){
+        // eror
+    }
+    return res.json(
+        {
+            data: data
+        }
+    )
+ });
+
+ router.put('/users/apply', async (req, res, next) => {
+    // console.log("upadted AAAAAAAAAAA",req.query.id)
+    // console.log("upadted AAAAAAAAAAA",req.query.hrRef)
+    const data = await Post.findById(req.query.id).then((post)=>{
+        post.applicants.push(req.query.hrRef)
+        post.save();
+
+        // post.update(
+        //     { $addToSet: { applicants: req.query.hrRef  } }
+        //  )
+    }).catch(next);
+ });
+
+ router.get('/users/appliedposts', async (req, res, next) => {
+    // console.log("upadted AAAAAAAAAAA",req.query.id)
+    // console.log("upadted AAAAAAAAAAA",req.query.hrRef)
+    const data = await Post.find({applicants: req.query.id})
+    if(!data){
+        // eror
+    }
+    return res.json(data);
+ });
+
+
+ router.put('/hrs/expUpdate', async (req, res, next) => {
+    console.log("upadted AAAAAAAAAAA",req.query.id)
+    const data = await Hr.findById(req.query.id).then((user)=> {
+        user.experience.push(req.body);
+        user.save()
+    })
+    // data.save()
+    if(!data){
+        // eror
+    }
+    return res.json(
+        {
+            data: data
+        }
+    )
+ });
 
 
 router.put('/users/update', async (req, res, next) => {
@@ -298,6 +357,40 @@ router.put('/users/update', async (req, res, next) => {
         console.log('Error occured', error);
     }
 });
+
+ router.put('/users/eduUpdate', async (req, res, next) => {
+    console.log("upadted AAAAAAAAAAA",req.query.id)
+    const data = await Applicant.findById(req.query.id).then((user)=> {
+        user.education.push(req.body);
+        user.save()
+    })
+    // data.save()
+    if(!data){
+        // eror
+    }
+    return res.json(
+        {
+            data: data
+        }
+    )
+ });
+
+ router.put('/users/expUpdate', async (req, res, next) => {
+    console.log("upadted AAAAAAAAAAA",req.query.id)
+    const data = await Applicant.findById(req.query.id).then((user)=> {
+        user.experience.push(req.body);
+        user.save()
+    })
+    // data.save()
+    if(!data){
+        // eror
+    }
+    return res.json(
+        {
+            data: data
+        }
+    )
+ });
 
 
 router.get('/users', async (req, res, next) => {
@@ -407,16 +500,18 @@ router.get('/user', async (req, res, next) => {
 
 // failure and success
 
-// function send_success(res, data) {
-//     res.writeHead(200, {
-//         "Content-Type": "application/json"
-//     });
-//     var output = {
-//         error: null,
-//         data: data
-//     };
-//     res.end(JSON.stringify(output) + "\n");
-// }
+function send_success(res, data, message) {
+    res.writeHead(200, {
+        "Content-Type": "application/json"
+    });
+    var output = {
+        success: true,
+        error: null,
+        data: data,
+        message: message
+    };
+    res.end(JSON.stringify(output) + "\n");
+}
 
 // function send_failure(res, server_code, err) {
 //     var code = (err.code) ? err.code : err.name;
@@ -432,30 +527,29 @@ router.get('/user', async (req, res, next) => {
 
 router.post('/hr', async (req, res) => {
     // res.cookie("SESSIONID", jwtBearerToken, {httpOnly:true, secure:true});
-    console.log('chello', req.body);
+    // console.log('chello', req.body);
     if (req.body.isApplicant) {
         const user_details = JSON.parse(JSON.stringify(req.body))
         let applicant = new Applicant(user_details);
         applicant.encryptPassword(user_details.password);
         // applicant.isApplicant = false;
-        const user = await applicant.save()
-        if (!user) {
-            send_failure(401, 'please try again')
-        }
-        return res.json({
-            data: applicant.toProfileJSONFor()
+        applicant.save().then(() => {
+            return send_success(res, applicant.toProfileJSONFor(), 'Applicant Created!')
+        }).catch(err => {
+            console.log(err);
+            
         });
 
     } else if (req.body.isHr) {
+        console.log('chello', req.body);
         const user_details = JSON.parse(JSON.stringify(req.body))
         let hr = new Hr(user_details);
         hr.encryptPassword(user_details.password);
-        const user = await hr.save()
-        if (!user) {
-            send_failure(401, 'please try again')
-        }
-        return res.json({
-            data: hr.toProfileJSONFor()
+        hr.save().then(() => {
+            return send_success(res, hr.toProfileJSONFor(), 'Applicant Created!');
+        }).catch(err => {
+            console.log(err);
+            
         });
     }
 });
@@ -513,100 +607,10 @@ router.post('/user/upload-profile', upload.any(), async (req, res, next) => {
         console.log(fs.renameSync(file.path, 'D:/Users/mitta/Desktop/Jobnut/jobnut-server/static/images/' + final_fn));
         
         console.log('user is :mlmlm ', user.email, user.profile_photo)
-        res.status(201).json({
-            success: true,
-            data: final_fn,
-            message: 'profile pic uploaded!'
-        })
+        return send_success(res,final_fn,'profile pic uploaded!')
     } catch (error) {
 
     }
-})
-
-router.put('/v1/hr', (req, res) => {
-    var user_details_to_add = JSON.parse(JSON.stringify(req.body));
-    console.log(user_details_to_add);
-
-    if (user_details_to_add.isApplicant) {
-        applicantModel.findOne({
-            email: user_details_to_add.email
-        }, (err, reply) => {
-            if (!err, reply) {
-                console.log('user exist!');
-                return false
-            }
-            // next();
-        })
-        applicantModelObj = new applicantModel(user_details_to_add);
-        addNewUser(applicantModelObj);
-    } else if (user_details_to_add.isHr) {
-        hrModel.findOne({
-            email: user_details_to_add.email
-        }, (err, reply) => {
-            if (!err, reply) {
-                console.log('user exist!');
-                return false
-            }
-            // next();
-        })
-        hrModelObj = new hrModel(user_details_to_add);
-        addNewUser(hrModelObj);
-    } else {
-        console.log(new Error('Nothing in: ', user_details_to_add));
-    }
-    // console.log(jobModelObj);
-})
-
-router.get('/v1/posts', (req, res) => {
-    postModel.find((err, result) => {
-        send_success(res, result);
-    })
-})
-
-router.get('/v1/posts/:post_id', (req, res) => {
-    var post_id = req.params.post_id;
-    // console.log(' ❌ ', req.params.post_id);
-    postModel.findOne({
-        _id: post_id
-    }, (err, result) => {
-        if (err) {
-            send_failure(res, 404, no_such_post());
-        }
-        console.log(' ❌ ', result);
-        send_success(res, result);
-        // return;
-    })
-})
-
-router.put('/posts', (req, res) => {
-    var post_details_to_add = JSON.parse(JSON.stringify(req.body));
-    postModelObj = new postModel(post_details_to_add);
-    addNewPost(postModelObj);
-    // send_success(res, resu)
-})
-
-async function addNewPost(postObj) {
-    console.log(' 💤 ', postObj);
-    try {
-        const data = await postObj.save()
-        if (!data) {
-            return res.sendStatus(401);
-        }
-        console.log(true);
-        console.log('database saved!');
-    } catch (error) {
-        console.log('Error', error);
-    }
-}
-
-router.post('v1/hr/update', async (req, res, next) => {
-    const hr_detail1 = JSON.parse(JSON.stringify(req.body))
-    let hr = new Hr(user_details);
-    await hr.save()
-    return res.json({
-        hr: hr.toProfileJSONFor()
-    });
-
 })
 
 module.exports = router;

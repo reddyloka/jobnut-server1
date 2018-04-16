@@ -2,6 +2,7 @@ var mongoose = require('mongoose');
 var router = require('express').Router();
 var Post = mongoose.model('postModel');
 const Hr = mongoose.model('hrModel');
+var Applicant = mongoose.model('applicantModel');
 var auth = require('../auth');
 // const { authenticate } = require('../../_middleware/check-auth');
 
@@ -29,28 +30,56 @@ router.get('/all/post', (req, res, next) => {
     // }
 });
 
+
+// router.get('/applieddetails',  async (req, res, next) => {
+//     console.log('game over posts:: ', req.query.id)
+//       const data=  await Post.findById(req.query.id).populate(
+//           {
+//               path:'applicants',
+//               match: {
+//                   firstName: { $gte: 'Gopi'}
+//               }
+//             }
+//         ).populate('hrRef')
+//             if (!data) {
+//                 return res.sendStatus(401);
+//             }else{
+//         //         data.applicants.map((ele)=>{
+//         //      Applicant.findById(ele).then((user) => {
+//         //     if(user){
+//         //         return res.json({
+//         //         data: user
+//         //     });
+//         //     }
+//         // })
+//         // })
+//         return res.json({
+//                     data
+//                 });
+//         }
+
+// });
+
 router.get('/:post_id', (req, res, next) => {
     console.log('game over posts ');
-    user_details = JSON.parse(JSON.stringify(req.body));
+    // user_details = JSON.parse(JSON.stringify(req.body));
     // if (user_details.isHr && user_details.status) {
-        Post.findOne({_id: req.params.post_id}).then((user) => {
-            console.log(user);
-            
+        Post.findOne({_id: req.params.post_id}).populate('applicants').then((user) => {
             if (!user) {
                 return res.sendStatus(401);
             }
             return res.json( {
                 data: user
-            } );
+            });
         }).catch(next);
     // }
 });
 
-router.get('/', (req, res, next) => {
-    console.log('game over posts:: ', req.query.id)
-    user_details = JSON.parse(JSON.stringify(req.body));
+router.get('/', auth ,(req, res, next) => {
+    console.log('game over posts:: ', req.userData)
+    // user_details = JSON.parse(JSON.stringify(req.body));
     // if (user_details.isHr && user_details.status) {
-        Post.find({hrRef: req.query.id}).populate('hrRef').then((user) => {
+        Post.find({hrRef: req.userData.id}).then((user) => {
             if (!user) {
                 return res.sendStatus(401);
             }
@@ -61,13 +90,26 @@ router.get('/', (req, res, next) => {
     // }
 });
 
+function send_success(res, data, message) {
+    res.writeHead(200, {
+        "Content-Type": "application/json"
+    });
+    var output = {
+        success: true,
+        error: null,
+        data: data,
+        message: message
+    };
+    res.end(JSON.stringify(output) + "\n");
+}
+
 
 router.put('/new-post', auth, async (req, res, next) => {
     console.log('new post', req.userData);
     // let post = new Post();
     const post_details = JSON.parse(JSON.stringify(req.body));
     
-    const user = await Hr.findById(req.query.id);
+    const user = await Hr.findById(req.userData.id);
     console.log('user is ',user);
         const post = new Post(post_details);
         post.hrRef = user;+
@@ -77,11 +119,8 @@ router.put('/new-post', auth, async (req, res, next) => {
         if (!result) {
             res.send_failure(401, 'Try Again!')
         }
-        res.json({
-            success: true,
-            message: 'Successfully Saved!',
-            data: result
-        })
+        send_success(res, result, 'Successfully Saved!');
+
         console.log('result::',result);
         // return post.save().then(() => {
         //     return res.json({

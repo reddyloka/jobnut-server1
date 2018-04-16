@@ -32,9 +32,12 @@ if (!isProduction) {
 }
 
 if(isProduction){
-  mongoose.connect(process.env.MONGODB_URI);
+  // mongoose.connect(process.env.MONGODB_URI);
 } else {
-  mongoose.connect('mongodb://localhost:27017/jobnut-server');
+  mongoose.connect('mongodb://anvesh:test@ds133856.mlab.com:33856/jobnut-server',(err)=>{
+    if(!err)
+    console.log("Database connected successfully")
+  });
   mongoose.set('debug', true);
 }
 

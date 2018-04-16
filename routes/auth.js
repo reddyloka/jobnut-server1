@@ -26,8 +26,8 @@ var secret = require('../config').secret;
 
 var auth = (req, res, next) => {
   try {
-      const token = req.body.token;
-      console.log('bodyknkk is: ', req.query.token);
+      const token = req.query.token;
+      console.log('bodyknkk is: ', req.query);
       var decoded = jwt.verify(req.query.token, secret);
       req.userData = decoded;
       // await console.log('DECODEDS is: ', jwt.verify(req.query.token, secret));
