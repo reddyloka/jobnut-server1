@@ -8,7 +8,7 @@ router.use('/posts', require('./posts'));
 
 
 router.use(function(err, req, res, next){
-    
+
   if(err.name === 'ValidationError'){
     return res.status(422).json({
       errors: Object.keys(err.errors).reduce(function(errors, key){
@@ -18,7 +18,7 @@ router.use(function(err, req, res, next){
       }, {})
     });
   }
-
+  
   return next(err);
 });
 

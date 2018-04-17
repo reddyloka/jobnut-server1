@@ -9,9 +9,8 @@ var Post = mongoose.model('postModel');
 
 router.get('/hrs', async (req, res, next) => {
 
-    console.log('data from hr')
   try{
-      console.log('data from hr',req.query.id)
+      console.log('data from hr', req.query.id)
     const user = await Hr.findById(req.query.id)
     if(!user){
         return res.status(401).json({
@@ -26,14 +25,18 @@ router.get('/hrs', async (req, res, next) => {
       console.log("data from the hr details",e);
   }
  
-    // }
 });
 
 router.put('/hrs/update', async (req, res, next) => {
     console.log("upadted AAAAAAAAAAA",req.query.id)
     const data = await Hr.findByIdAndUpdate(req.query.id, req.body)
     if(!data){
-        // eror
+        return res.status(401).json({
+            success:false,
+            errors:{
+                message:'User Doesn\'t Exist !'
+            }
+        })
     }
     return res.json(
         {
@@ -68,11 +71,10 @@ router.put('/hrs/update', async (req, res, next) => {
 
  router.put('/hrs/expUpdate', async (req, res, next) => {
     console.log("upadted AAAAAAAAAAA",req.query.id)
-    const data = await Hr.findById(req.query.id).then((user)=> {
-        user.experience.push(req.body);
-        user.save()
-    })
-    // data.save()
+    const data = await Hr.findById(req.query.id)
+    const user1 = await user.experience.push(req.body);
+    user1.save()
+
     if(!data){
         // eror
     }
@@ -190,13 +192,7 @@ router.post('/login', (req, res, next) => {
         }).then((user) => {
             console.log(' ❌', user, user_details.username)
             if (!user) {
-                return res.status(401).json({
-                    success: false,
-                    errors: {
-                        message: 'Sign Up First!'
-                    }
-
-                });
+                return res.sendStatus(401);
             }
             return res.json({
                 user: user.toAuthJSON()
