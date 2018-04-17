@@ -43,10 +43,14 @@ router.put('/hrs/update', async (req, res, next) => {
  });
 
  router.put('/users/apply', async (req, res, next) => {
-    // console.log("upadted AAAAAAAAAAA",req.query.id)
-    // console.log("upadted AAAAAAAAAAA",req.query.hrRef)
+    console.log("upadted AAAAAAAAAAA",req.query.id)
+    console.log("upadted AAAAAAAAAAA",req.query.hrRef)
     const data = await Post.findById(req.query.id).then((post)=>{
-        post.applicants.push(req.query.hrRef)
+        const newRequest = {
+            _id: req.query.hrRef,
+            isShortlisted: false
+        }
+        post.applicants.push(newRequest);
         post.save();
 
         // post.update(
@@ -58,7 +62,7 @@ router.put('/hrs/update', async (req, res, next) => {
  router.get('/users/appliedposts', async (req, res, next) => {
     // console.log("upadted AAAAAAAAAAA",req.query.id)
     // console.log("upadted AAAAAAAAAAA",req.query.hrRef)
-    const data = await Post.find({applicants: req.query.id})
+    const data = await Post.find({"applicants._id": req.query.id}).populate('applicants._id')
     if(!data){
         // eror
     }
@@ -88,7 +92,7 @@ router.put('/users/update', async (req, res, next) => {
     console.log("upadted AAAAAAAAAAA",req.query.id)
     const data = await Applicant.findByIdAndUpdate(req.query.id, req.body)
     if(!data){
-        // eror
+        console.log('fail')
     }
     return res.json(
         {

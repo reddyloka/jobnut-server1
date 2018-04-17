@@ -5,6 +5,20 @@ const Hr = mongoose.model('hrModel');
 var auth = require('../auth');
 
 
+
+router.put('/shortlist', async (req, res, next) => {
+    console.log("upadted AAAAAAAAAAA",req.query.id)
+    console.log("upadted AAAAAAAAAAA",req.query.hrRef)
+    console.log("upadted AAAAAAAAAAA",req.body)
+
+      const data = await Post.findByIdAndUpdate(req.query.id,{ $set: {applicants: {
+          _id: req.query.hrRef,
+          isShortlisted: req.body.isShortlisted 
+        } }})
+       if(data){
+        res.json(data)
+       }
+ });
 router.get('/all/post', async (req, res, next) => {
 
     try {
@@ -21,11 +35,34 @@ router.get('/all/post', async (req, res, next) => {
     }
 });
 
+router.put('/update', async (req, res, next) => {
+
+    try {
+        console.log("upadted AAAAAAAAAAA",req.query.id)
+        console.log("upadted AAAAAAAAAAA",req.body)
+        const data = await Post.findByIdAndUpdate(req.query.id, req.body)
+        if(!data){
+
+        }
+        console.log(data);
+        
+        return res.json(
+            {
+                data: data
+            }
+        )
+    }
+    catch (error) {
+        console.log('Error', error);
+    }
+});
+
 router.get('/:post_id', async (req, res, next) => {
     console.log('game over posts ');
     try {
         user_details = JSON.parse(JSON.stringify(req.body));
         const user = await Post.findOne({ _id: req.params.post_id })
+        .populate('applicants._id')
         if (!user) {
             return res.sendStatus(401);
         }
@@ -39,10 +76,10 @@ router.get('/:post_id', async (req, res, next) => {
 });
 
 router.get('/', async (req, res, next) => {
-    console.log('game over posts:: ', req.query.id)
+    console.log('game over posts:: ', req.query.hrRef)
     try {
         user_details = JSON.parse(JSON.stringify(req.body));
-        const user = await Post.find({ hrRef: req.query.id }).populate('hrRef')
+        const user = await Post.find({ hrRef: req.query.hrRef }).populate('hrRef')
         if (!user) {
             return res.sendStatus(401);
         }
