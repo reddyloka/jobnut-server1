@@ -393,19 +393,31 @@ router.put('/users/update', async (req, res, next) => {
  });
 
 
-router.get('/users', async (req, res, next) => {
-    console.log(req.query.id);
-    try {
-        // if (user_details.isHr && user_details.status) {
-        const data = await Applicant.find()
-        if (!data) {
-            return res.sendStatus(401);
-        }
-        return res.json(data);
-    } catch (error) {
-        console.log('Error: ', error);
-    }
-});
+// router.get('/users', async (req, res, next) => {
+//     console.log(req.query.id);
+//     try {
+//         // if (user_details.isHr && user_details.status) {
+//         const data = await Applicant.findById(req.query.id);
+//         if (!data) {
+//             return res.sendStatus(401);
+//         }
+//         return res.json(data);
+//     } catch (error) {
+//         console.log('Error: ', error);
+//     }
+// });
+router.get('/users', (req, res, next) => {
+    console.log('iski ,aaplsn',req.query.id);
+     // if (user_details.isHr && user_details.status) {
+     Applicant.findById(req.query.id).then((user) => {
+         if (!user){
+             return res.sendStatus(401);
+         }
+         return res.json(user);
+     }).catch(next);
+     
+     // }
+ });
 
 
 
@@ -416,21 +428,11 @@ router.post('/login', (req, res, next) => {
     user_details = JSON.parse(JSON.stringify(req.body));
     console.log('game over', user_details);
     if (!req.body.username) {
-        return res.status(422).json({
-            success: false,
-            errors: {
-                email: 'can\'t be blank'
-            }
-        })
+        return res.send_failure(422,'can\'t be blank')
     }
-
+    
     if (!req.body.password) {
-        return res.status(422).json({
-            success: false,
-            errors: {
-                password: 'can\'t be blank'
-            }
-        })
+        return res.send_failure(422,'can\'t be blank')
     }
     if (user_details.isHr) {
         Hr.findOne({
@@ -558,17 +560,14 @@ router.post('/hr', async (req, res) => {
 
 router.post('/user/upload-profile', upload.any(), async (req, res, next) => {
     try {
-
-        console.log('inside', req.query);
-
-
+        console.log('iefenside', req.query);
         let user;
-        if (req.query.isHr) {
-            console.log('kjgj');
-
+        if ( Boolean(req.query.isHr) === 'true' ) {
+            console.log('user is hr', req.query.isHr);
             user = await Hr.findById(req.query.id)
             console.log(req.query.id)
-        } else if (req.query.isApplicant) {
+        } else if (req.query.isApplicant === 'true') {
+            console.log('user is applicant');            
             user = await Applicant.findById(req.query.id)
         } else {
             throw new Error('Unauthorized Attempt.');
@@ -586,6 +585,8 @@ router.post('/user/upload-profile', upload.any(), async (req, res, next) => {
             return;
         }
 
+        console.log('files are : ', req.files);
+        
         file = req.files[0];
         // console.log('file is: ', req.files[0]);
         const extention = await path.extname(file.originalname);
@@ -596,11 +597,18 @@ router.post('/user/upload-profile', upload.any(), async (req, res, next) => {
 
         const final_fn = file.filename + extention;
 
-        // console.log(':::', final_fn, '  :: ', file.path)
+        console.log(':::', final_fn, '  :: ', file.path)
         if (file.fieldname == 'profile_photo') {
-            await Hr.findByIdAndUpdate(req.query.id, {
+            
+            console.log('insde system::');
+            if ( user.isHr ) await Hr.findByIdAndUpdate(req.query.id, {
                 profile_photo: final_fn
             });
+            if ( user.isApplicant ) await Applicant.findByIdAndUpdate(req.query.id, {
+                profile_photo: final_fn
+            });
+        }else {
+
         }
 
         
