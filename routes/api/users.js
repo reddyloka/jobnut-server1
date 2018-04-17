@@ -80,7 +80,7 @@ router.put('/users/update', async (req, res, next) => {
     console.log("upadted AAAAAAAAAAA",req.query.id)
     const data = await Applicant.findByIdAndUpdate(req.query.id, req.body)
     if(!data){
-        // eror
+        console.log('fail')
     }
     return res.json(
         {

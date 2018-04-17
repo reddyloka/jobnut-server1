@@ -45,10 +45,9 @@ const applicantSchema = new Schema({
 
 applicantSchema.plugin(uniqueValidator, { message: 'is already taken '});
 
-applicantSchema.methods.encryptPassword = function(key) {
-    return bcrypt.hash(key, saltRounds).then((hash)=> {
+applicantSchema.methods.encryptPassword = async function(key) {
+    const hash = bcrypt.hash(key, saltRounds)
         return this.hash = hash;
-    })
 }
 
 applicantSchema.methods.decryptPassword = function(key) {
