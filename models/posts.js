@@ -22,19 +22,30 @@ const postSchema = new Schema({
     ReportingVenue: String,
     ResourcePersonContact: String,
     selectionProcedure: String,
-    hrRef : {
+    hrRef: {
         type: Schema.Types.ObjectId,
         ref: 'hrModel'
     },
-    applicants: [
-        {
+    applicants: [{
+        _id:{
             type: Schema.Types.ObjectId,
             ref: 'applicantModel'
-        }
-    ]
-}, {timestamps: true});
+        },
+       isShortlisted:{
+           type:Boolean,
+           default:false
+        } 
+    }]
+}, { timestamps: true});
 
-postSchema.methods.toJSONFor = function(user) {
+// postSchema.virtual('applicants', {
+//     ref: 'applicantModel',
+//     localField: 'name',
+//     foreignField: 'band',
+//     isShortlisted: false
+// })
+
+postSchema.methods.toJSONFor = function (user) {
     return {
         title: this.title,
         companyname: this.companyname,
@@ -52,7 +63,7 @@ postSchema.methods.toJSONFor = function(user) {
         bondDetails: this.bondDetails,
         ReportingVenue: this.ReportingVenue,
         ResourcePersonContact: this.ResourcePersonContact,
-        selectionProcedure: this.selectionProcedure,   
+        selectionProcedure: this.selectionProcedure,
     }
 }
 
