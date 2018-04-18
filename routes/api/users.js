@@ -311,7 +311,7 @@ router.put('/hrs/update', async (req, res, next) => {
  });
 
  router.get('/users/appliedposts', async (req, res, next) => {
-    const data = await Post.find({applicants: req.query.id})
+    const data = await Post.find({applicants:{ _id: req.query.id, isShortlisted}})
     if(!data){
         // eror
     }
