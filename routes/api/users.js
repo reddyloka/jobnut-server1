@@ -93,7 +93,7 @@ router.put('/users/update', async (req, res, next) => {
     const data = await Applicant.findByIdAndUpdate(req.query.id, req.body)
     if(!data){
         console.log('fail')
-    }
+       }
     return res.json(
         {
             data: data
