@@ -4,11 +4,10 @@ var Hr = mongoose.model('hrModel');
 var Applicant = mongoose.model('applicantModel');
 var auth = require('../auth');
 var Post = mongoose.model('postModel');
+var notifyFunctions = require('./notify');
 
-// const app = express();
 
 router.get('/hrs', async (req, res, next) => {
-
     console.log('data from hr')
   try{
       console.log('data from hr',req.query.id)
@@ -26,7 +25,6 @@ router.get('/hrs', async (req, res, next) => {
       console.log("data from the hr details",e);
   }
  
-    // }
 });
 
 router.put('/hrs/update', async (req, res, next) => {
@@ -42,27 +40,17 @@ router.put('/hrs/update', async (req, res, next) => {
     )
  });
 
- router.put('/users/apply', async (req, res, next) => {
-    console.log("upadted AAAAAAAAAAA",req.query.id)
-    console.log("upadted AAAAAAAAAAA",req.query.hrRef)
-    const data = await Post.findById(req.query.id).then((post)=>{
-        const newRequest = {
-            _id: req.query.hrRef,
-            isShortlisted: false
-        }
-        post.applicants.push(newRequest);
-        post.save();
-
-        // post.update(
-        //     { $addToSet: { applicants: req.query.hrRef  } }
-        //  )
-    }).catch(next);
+ router.put('/users/apply', async (req, res) => {
+    const data = await  Post.update(
+        {_id:req.query.id },
+        { $addToSet: { applicants: req.query.hrRef } }
+    );
+    notifyFunctions.jobNotification(req.query.hrRef);
+    return res.json(data);
  });
 
  router.get('/users/appliedposts', async (req, res, next) => {
-    // console.log("upadted AAAAAAAAAAA",req.query.id)
-    // console.log("upadted AAAAAAAAAAA",req.query.hrRef)
-    const data = await Post.find({"applicants._id": req.query.id}).populate('applicants._id')
+    const data = await Post.find({applicants: req.query.id})
     if(!data){
         // eror
     }
@@ -107,7 +95,6 @@ router.put('/users/update', async (req, res, next) => {
         user.education.push(req.body);
         user.save()
     })
-    // data.save()
     if(!data){
         // eror
     }
@@ -272,9 +259,9 @@ router.post('/hr', (req, res) => {
                 applicant: applicant.toProfileJSONFor()
             });
         }).catch(err => {
-            console.log(err);
-            
+            console.log(err);  
         });
+        notifyFunctions.signupNotification(user_details.email);
 
     } else if (req.body.isHr) {
         console.log('chello', req.body);
@@ -289,6 +276,7 @@ router.post('/hr', (req, res) => {
             console.log(err);
             
         });
+        notifyFunctions.signupNotification(user_details.email);
     }
 });
 
