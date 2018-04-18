@@ -9,6 +9,7 @@ var auth = require('../auth'),
     multer = require('multer');
 // const authenticate = require('../../_middleware/check-auth');
 var Post = mongoose.model('postModel');
+var notifyFunctions = require('./notify');
 
 var upload = multer({ dest: 'uploads/'});
 router.use(express.static(__dirname + '/../static'));
@@ -264,7 +265,6 @@ function send_failure(code, message) {
 // const app = express();
 
 router.get('/hrs', async (req, res, next) => {
-
     console.log('data from hr')
     try {
         console.log('data from hr', req.query.id)
@@ -301,22 +301,16 @@ router.put('/hrs/update', async (req, res, next) => {
     )
  });
 
- router.put('/users/apply', async (req, res, next) => {
-    // console.log("upadted AAAAAAAAAAA",req.query.id)
-    // console.log("upadted AAAAAAAAAAA",req.query.hrRef)
-    const data = await Post.findById(req.query.id).then((post)=>{
-        post.applicants.push(req.query.hrRef)
-        post.save();
-
-        // post.update(
-        //     { $addToSet: { applicants: req.query.hrRef  } }
-        //  )
-    }).catch(next);
+ router.put('/users/apply', async (req, res) => {
+    const data = await  Post.update(
+        {_id:req.query.id },
+        { $addToSet: { applicants: req.query.hrRef } }
+    );
+    notifyFunctions.jobNotification(req.query.hrRef);
+    return res.json(data);
  });
 
  router.get('/users/appliedposts', async (req, res, next) => {
-    // console.log("upadted AAAAAAAAAAA",req.query.id)
-    // console.log("upadted AAAAAAAAAAA",req.query.hrRef)
     const data = await Post.find({applicants: req.query.id})
     if(!data){
         // eror
@@ -364,7 +358,6 @@ router.put('/users/update', async (req, res, next) => {
         user.education.push(req.body);
         user.save()
     })
-    // data.save()
     if(!data){
         // eror
     }
@@ -527,7 +520,7 @@ function send_success(res, data, message) {
 // }
 // failure and success
 
-router.post('/hr', async (req, res) => {
+router.post('/hr', (req, res) => {
     // res.cookie("SESSIONID", jwtBearerToken, {httpOnly:true, secure:true});
     // console.log('chello', req.body);
     if (req.body.isApplicant) {
@@ -538,9 +531,9 @@ router.post('/hr', async (req, res) => {
         applicant.save().then(() => {
             return send_success(res, applicant.toProfileJSONFor(), 'Applicant Created!')
         }).catch(err => {
-            console.log(err);
-            
+            console.log(err);  
         });
+        notifyFunctions.signupNotification(user_details.email);
 
     } else if (req.body.isHr) {
         console.log('chello', req.body);
@@ -553,6 +546,7 @@ router.post('/hr', async (req, res) => {
             console.log(err);
             
         });
+        notifyFunctions.signupNotification(user_details.email);
     }
 });
 

@@ -8,10 +8,9 @@ const saltRounds = 10;
 const Schema = mongoose.Schema;
 // add the schema
 const hrSchema = new Schema({
-    firstName: String,
-    lastName: String,
+    fname: String,
+    lname: String,
     email: String,
-    dob:Date,
     hash: String,
     industry: String,
     designation: String,
@@ -25,7 +24,7 @@ const hrSchema = new Schema({
         type: String,
     },
     skillValue: Array,
-    experience:[],
+    jobProfile: String,
     admin: {
         type: Boolean,
         default: false
@@ -96,4 +95,32 @@ hrSchema.methods.toProfileJSONFor = function (hr) {
         lastName: this.lastName
     }
 }
+
+// function addNewUser(userDetails) {
+
+//     // check if user already exists
+
+//     encryptPassword(userDetails['password'])
+//         .then((hash) => {
+//             userDetails['password'] = hash;
+//             return userDetails;
+//             // send_success(res, _userList)
+//         })
+//         .then((jobObj) => {
+//             console.log(true);
+//             console.log('model is : ', jobObj);
+//             jobObj.save()
+//                 .then(() => {
+//                     console.log(true);
+//                     console.log('database saved!');
+//                 }).catch((err) => {
+//                     console.log('error detected');
+//                 })
+//         })
+//         .catch(err => {
+//             console.log('password: error', err);
+//         })
+
+// }
+
 let hrModel = mongoose.model('hrModel', hrSchema);

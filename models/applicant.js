@@ -51,10 +51,11 @@ const applicantSchema = new Schema({
 
 applicantSchema.plugin(uniqueValidator, { message: 'is already taken '});
 
-applicantSchema.methods.encryptPassword = function(key) {
-    return bcrypt.hash(key, saltRounds).then((hash)=> {
+applicantSchema.methods.encryptPassword = async function(key) {
+    const hash = await bcrypt.hash(key, saltRounds)
+    console.log('error is here: ', hash);
+    
         return this.hash = hash;
-    })
 }
 
 applicantSchema.methods.decryptPassword = function(key) {
