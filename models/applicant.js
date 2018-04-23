@@ -10,8 +10,14 @@ const Schema = mongoose.Schema;
 const applicantSchema = new Schema({
     firstName: String,
     lastName: String,
-    email: String,
-    hash: String,
+    email: {
+        type: String,
+        // unique: true
+    },
+    hash: {
+        type: String,
+        // unique: true
+    },
     dob: Date,
     phone: String,
     location: String,
@@ -20,7 +26,7 @@ const applicantSchema = new Schema({
     education:[],
     experience:[],
     skillValue: Array,
-
+    profile_photo: String,
     admin: {
         type: Boolean,
         default: false
@@ -47,6 +53,11 @@ applicantSchema.plugin(uniqueValidator, { message: 'is already taken '});
 
 applicantSchema.methods.encryptPassword = async function(key) {
     const hash = await bcrypt.hash(key, saltRounds)
+<<<<<<< HEAD
+=======
+    console.log('error is here: ', hash);
+    
+>>>>>>> 68d83abfe89d7b5c6b25dbd1d8bc1ce433b0a586
         return this.hash = hash;
 }
 
@@ -79,6 +90,8 @@ applicantSchema.methods.toAuthJSON = function() {
 
 applicantSchema.methods.toProfileJSONFor = function(){
     return {
+        isHr: this.isHr,
+        isApplicant: this.isApplicant,
         firstName: this.firstName,
         lastName: this.lastName,
         email: this.email,

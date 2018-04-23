@@ -1,11 +1,11 @@
 var router = require('express').Router();
 
+// const router = express();
 
 router.use('/', require('./users'));
 router.use('/posts', require('./posts'));
 // router.use('/hr', require('./users'));
 // router.use('/v1/user', require('./users'));
-router.use('/notifications',require('./notifymail'));
 
 
 router.use(function(err, req, res, next){

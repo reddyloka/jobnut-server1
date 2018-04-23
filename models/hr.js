@@ -19,6 +19,10 @@ const hrSchema = new Schema({
     state: String,
     city: String,
     phone: String,
+    jobProfile: String,
+    profile_photo: {
+        type: String,
+    },
     skillValue: Array,
     jobProfile: String,
     admin: {
@@ -39,22 +43,18 @@ const hrSchema = new Schema({
     }
 });
 
-hrSchema.plugin(uniqueValidator, { message: 'is already taken '});
+hrSchema.plugin(uniqueValidator, {
+    message: 'is already taken '
+});
 
-hrSchema.methods.encryptPassword = async function(key) {
-    try {
-        const data = await bcrypt.hash(key, saltRounds)
-            if(!data) {
-                console.log('error');
-            }
-            console.log(' ❌',this.jobsPost)
-            setTimeout(()=>{
-                console.log(' ❌',this.jobsPost)
-            }, 5000)
-            return this.password = data;
-    } catch (error) {
-        console.log('Error', error);
-    }
+hrSchema.methods.encryptPassword = function (key) {
+    bcrypt.hash(key, saltRounds).then((hash) => {
+        console.log(' ❌', this.jobsPost)
+        setTimeout(() => {
+            console.log(' ❌', this.jobsPost)
+        }, 5000)
+        return this.password = hash;
+    });
 }
 
 
@@ -63,10 +63,10 @@ hrSchema.methods.decryptPassword = function (key) {
     return bcrypt.compare(key, this.hash);
 }
 
-hrSchema.methods.generateJWT = function() {
+hrSchema.methods.generateJWT = function () {
     let today = new Date();
     let exp = new Date(today);
-    exp.setDate(today.getDate()+60);
+    exp.setDate(today.getDate() + 60);
 
     return jwt.sign({
         id: this._id,
@@ -75,7 +75,7 @@ hrSchema.methods.generateJWT = function() {
     }, secret);
 };
 
-hrSchema.methods.toAuthJSON = function() {
+hrSchema.methods.toAuthJSON = function () {
     return {
         id: this._id,
         isHr: this.isHr,
@@ -85,8 +85,11 @@ hrSchema.methods.toAuthJSON = function() {
     };
 };
 
-hrSchema.methods.toProfileJSONFor = function(hr){
+hrSchema.methods.toProfileJSONFor = function (hr) {
     return {
+        _id: this._id,
+        isHr: this.isHr,
+        isApplicant: this.isApplicant,
         email: this.email,
         firstName: this.firstName,
         lastName: this.lastName
