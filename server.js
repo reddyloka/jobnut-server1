@@ -31,17 +31,11 @@ if (!isProduction) {
 if(isProduction){
   mongoose.connect(process.env.MONGODB_URI);
 } else {
-<<<<<<< HEAD
-  mongoose.connect('mongodb://anvesh:test@ds133856.mlab.com:33856/jobnut-server',(err)=>{
-    if(!err)
-    console.log("Database connected successfully")
-=======
   mongoose.connect('mongodb://anvesh:test@ds133856.mlab.com:33856/jobnut-server',(err,db)=>{
     if(!err)
     {
       console.log('Database connected successfully');
     }
->>>>>>> 11dc39775f6aadab042d800b3c95f14f7a41c46c
   });
   mongoose.set('debug', true);
 }

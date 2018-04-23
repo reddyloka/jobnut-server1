@@ -9,10 +9,6 @@ router.use('/notifications',require('./notifymail'));
 
 
 router.use(function(err, req, res, next){
-<<<<<<< HEAD
-
-=======
->>>>>>> 11dc39775f6aadab042d800b3c95f14f7a41c46c
   if(err.name === 'ValidationError'){
     return res.status(422).json({
       errors: Object.keys(err.errors).reduce(function(errors, key){
@@ -22,7 +18,7 @@ router.use(function(err, req, res, next){
       }, {})
     });
   }
-  
+
   return next(err);
 });
 
