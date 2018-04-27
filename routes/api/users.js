@@ -264,6 +264,7 @@ router.post('/hr', (req, res) => {
         }).catch(err => {
             console.log(err);  
         });
+        console.log('user mail',user_details.email);
         notifyFunctions.signupNotification(user_details.email);
 
     } else if (req.body.isHr) {
@@ -279,6 +280,7 @@ router.post('/hr', (req, res) => {
             console.log(err);
             
         });
+        console.log('hr mail',user_details.email);
         notifyFunctions.signupNotification(user_details.email);
     }
 });
