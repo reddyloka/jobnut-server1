@@ -47,19 +47,15 @@ hrSchema.plugin(uniqueValidator, {
     message: 'is already taken '
 });
 
-hrSchema.methods.encryptPassword = function (key) {
-    bcrypt.hash(key, saltRounds).then((hash) => {
-        console.log(' ❌', this.jobsPost)
-        setTimeout(() => {
-            console.log(' ❌', this.jobsPost)
-        }, 5000)
-        return this.password = hash;
-    });
+hrSchema.methods.encryptPassword = async function(key) {
+    const hash = await bcrypt.hash(key, saltRounds)
+    console.log('error is here: ', hash);
+      return this.hash = hash;
 }
 
 
 hrSchema.methods.decryptPassword = function (key) {
-    console.log('key is 🥇', key, this.hash)
+    // console.log('key is 🥇', key, this.hash)
     return bcrypt.compare(key, this.hash);
 }
 
