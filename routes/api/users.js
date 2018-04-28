@@ -41,19 +41,29 @@ router.put('/hrs/update', async (req, res, next) => {
  });
 
  router.put('/users/apply', async (req, res) => {
-    const data = await  Post.update(
-        {_id:req.query.id },
-        { $addToSet: { applicants: req.query.hrRef } }
-    );
-    notifyFunctions.jobNotification(req.query.hrRef);
+    
+    const data = Post.findById(req.query.id).then((post)=>{
+        newRequest={
+            _id: req.query.hrRef
+           }
+     post.applicants.push(newRequest)
+     post.save();
+    })
+    // notifyFunctions.jobNotification(req.query.hrRef);
+    if(data){
+        console.log('success')
     return res.json(data);
+    }else{
+        console.log('fail')
+    }
  });
 
- router.get('/users/appliedposts', async (req, res, next) => {
-    const data = await Post.find({applicants: req.query.id})
+ router.get('/users/appliedposts', async (req, res) => {
+    const data = await Post.find({'applicants._id': req.query.id})
     if(!data){
-        // eror
+     console.log('main',data)
     }
+    console.log('main',data)
     return res.json(data);
  });
 

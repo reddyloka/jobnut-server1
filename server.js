@@ -14,6 +14,7 @@ var isProduction = process.env.NODE_ENV === 'production';
 // Create global app object
 var app = express();
 
+
 app.use(cors());
 
 // Normal express config defaults
@@ -31,7 +32,7 @@ if (!isProduction) {
 }
 
 if(isProduction){
-  mongoose.connect(process.env.MONGODB_URI);
+  // mongoose.connect(process.env.MONGODB_URI);
 } else {
   mongoose.connect('mongodb://anvesh:test@ds133856.mlab.com:33856/jobnut-server',(err,db)=>{
     if(!err)
