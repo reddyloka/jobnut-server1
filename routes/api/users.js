@@ -8,8 +8,6 @@ var notifyFunctions = require('./notify');
 
 
 router.get('/hrs', async (req, res, next) => {
-    console.log('data from hr')
-  try{
       console.log('data from hr',req.query.id)
     const user = await Hr.findById(req.query.id)
     if(!user){
@@ -21,9 +19,6 @@ router.get('/hrs', async (req, res, next) => {
         })
     }
     return res.json(user);
-  } catch(e){
-      console.log("data from the hr details",e);
-  }
  
 });
 

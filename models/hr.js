@@ -8,8 +8,8 @@ const saltRounds = 10;
 const Schema = mongoose.Schema;
 // add the schema
 const hrSchema = new Schema({
-    fname: String,
-    lname: String,
+    firstName: String,
+    lastName: String,
     email: String,
     hash: String,
     industry: String,
