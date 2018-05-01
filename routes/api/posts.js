@@ -25,6 +25,7 @@ router.put('/shortlist', async (req, res, next) => {
           isShortlisted: req.body.isShortlisted 
         } }})
        if(data){
+           console.log('as')
         res.json(data)
        }
  });
