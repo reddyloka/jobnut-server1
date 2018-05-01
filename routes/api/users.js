@@ -248,27 +248,27 @@ router.get('/user', (req, res, next) => {
 
 // failure and success
 
-// function send_success(res, data) {
-//     res.writeHead(200, {
-//         "Content-Type": "application/json"
-//     });
-//     var output = {
-//         error: null,
-//         data: data
-//     };
-//     res.end(JSON.stringify(output) + "\n");
-// }
+function send_success(res, data) {
+    res.writeHead(200, {
+        "Content-Type": "application/json"
+    });
+    var output = {
+        error: null,
+        data: data
+    };
+    res.end(JSON.stringify(output) + "\n");
+}
 
-// function send_failure(res, server_code, err) {
-//     var code = (err.code) ? err.code : err.name;
-//     res.writeHead(server_code, {
-//         "Content-Type": "application/json"
-//     });
-//     res.end(JSON.stringify({
-//         error: code,
-//         message: err.message
-//     }) + "\n");
-// }
+function send_failure(res, server_code, err) {
+    var code = (err.code) ? err.code : err.name;
+    res.writeHead(server_code, {
+        "Content-Type": "application/json"
+    });
+    res.end(JSON.stringify({
+        error: code,
+        message: err.message
+    }) + "\n");
+}
 // failure and success
 
 router.post('/resetPassword',async (req,res)=>{
@@ -339,14 +339,14 @@ router.post('/hr', (req, res) => {
         let applicant = new Applicant(user_details);
         applicant.encryptPassword(user_details.password);
         applicant.save().then(() => {
+            notifyFunctions.signupApplicantNotification(data.email);
             return res.json({
                 applicant: applicant.toProfileJSONFor()
             });
         }).catch(err => {
             console.log(err);  
         });
-        console.log('user mail',user_details.email);
-        notifyFunctions.signupNotification(user_details.email);
+       
 
     } else if (req.body.isHr) {
         console.log('hr data', req.body);
@@ -355,13 +355,15 @@ router.post('/hr', (req, res) => {
         hr.encryptPassword(user_details.password);
         hr.save().then((data) => {
             console.log('new data ', data);
-            return send_success(res, hr.toProfileJSONFor(), 'hr Created!');
+            notifyFunctions.signupHrNotification(data.email);
+            return res.json({
+                hr: hr.toProfileJSONFor()
+            });
         }).catch(err => {
             console.log(err);
             
         });
-        console.log('hr mail',user_details.email);
-        notifyFunctions.signupNotification(user_details.email);
+        
     }
 });
 
