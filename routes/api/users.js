@@ -4,9 +4,9 @@ var Hr = mongoose.model('hrModel');
 var Applicant = mongoose.model('applicantModel');
 var auth = require('../auth');
 var Post = mongoose.model('postModel');
-var upload = multer({ dest: 'uploads/' });
+// var upload = multer({ dest: 'uploads/' });
 var notifyFunctions = require('./notify');
-router.use(express.static(__dirname + '/../static'));
+// router.use(express.static(__dirname + '/../static'));
 
 router.get('/hrs', async (req, res, next) => {
       console.log('data from hr',req.query.id)
