@@ -4,8 +4,9 @@ var Hr = mongoose.model('hrModel');
 var Applicant = mongoose.model('applicantModel');
 var auth = require('../auth');
 var Post = mongoose.model('postModel');
+var upload = multer({ dest: 'uploads/' });
 var notifyFunctions = require('./notify');
-
+router.use(express.static(__dirname + '/../static'));
 
 router.get('/hrs', async (req, res, next) => {
       console.log('data from hr',req.query.id)
@@ -23,10 +24,15 @@ router.get('/hrs', async (req, res, next) => {
 });
 
 router.put('/hrs/update', async (req, res, next) => {
-    console.log("upadted AAAAAAAAAAA",req.query.id)
+    console.log("in hr upadted fn", req.query.id)
     const data = await Hr.findByIdAndUpdate(req.query.id, req.body)
-    if(!data){
-        // eror
+    if (!data) {
+        return res.status(401).json({
+            success: false,
+            errors: {
+                message: 'User Doesn\'t Exist!'
+            }
+        })
     }
     return res.json(
         {
@@ -44,7 +50,6 @@ router.put('/hrs/update', async (req, res, next) => {
      post.applicants.push(newRequest)
      post.save();
     })
-    // notifyFunctions.jobNotification(req.query.hrRef);
     if(data){
         console.log('success')
     return res.json(data);
@@ -60,26 +65,40 @@ router.put('/hrs/update', async (req, res, next) => {
     }
     console.log('main',data)
     return res.json(data);
- });
+});
 
+router.put('/hrs/expUpdate', async (req, res, next) => {
+    console.log("in upadted experience", req.query.id)
+    console.log('data in body',req.body);
 
- router.put('/hrs/expUpdate', async (req, res, next) => {
-    console.log("upadted AAAAAAAAAAA",req.query.id)
-    const data = await Hr.findById(req.query.id).then((user)=> {
-        user.experience.push(req.body);
-        user.save()
-    })
-    // data.save()
-    if(!data){
-        // eror
+    const data = await Hr.findByIdAndUpdate(req.query.id, {'experience': req.body})
+
+    if (!data) {
+        return res.sendStatus(401);
     }
     return res.json(
         {
             data: data
         }
     )
- });
+});
 
+router.put('/hrs/skillsUpdate', async (req, res, next) => {
+    console.log("in upadted skills", req.query.id)
+    try {
+        const data = await Hr.findByIdAndUpdate(req.query.id, {'skillValue': req.body.skills})
+        if (!data) {
+            return res.sendStatus(401);
+        }
+        return res.json(
+            {
+                data: data
+            }
+        )
+    } catch (error) {
+        console.log('Error', error);
+    }
+});
 
 router.put('/users/update', async (req, res, next) => {
     console.log("upadted AAAAAAAAAAA",req.query.id)
@@ -94,31 +113,28 @@ router.put('/users/update', async (req, res, next) => {
     )
  });
 
- router.put('/users/eduUpdate', async (req, res, next) => {
-    console.log("upadted AAAAAAAAAAA",req.query.id)
-    const data = await Applicant.findById(req.query.id).then((user)=> {
-        user.education.push(req.body);
-        user.save()
-    })
-    if(!data){
-        // eror
+router.put('/users/eduUpdate', async (req, res, next) => {
+    console.log("upadted AAAAAAAAAAA", req.query.id)
+    const data = await Applicant.findById(req.query.id)
+    const user = await user.education.push(req.body);
+    user.save()
+    if (!data) {
+        return res.sendStatus(401);
     }
     return res.json(
         {
             data: data
         }
     )
- });
+});
 
- router.put('/users/expUpdate', async (req, res, next) => {
-    console.log("upadted AAAAAAAAAAA",req.query.id)
-    const data = await Applicant.findById(req.query.id).then((user)=> {
-        user.experience.push(req.body);
-        user.save()
-    })
-    // data.save()
-    if(!data){
-        // eror
+router.put('/users/expUpdate', async (req, res, next) => {
+    console.log("upadted AAAAAAAAAAA", req.query.id)
+    const data = await Applicant.findById(req.query.id)
+    const user = await user.experience.push(req.body);
+    user.save()
+    if (!data) {
+
     }
     return res.json(
         {
@@ -144,7 +160,16 @@ router.get('/users', (req, res, next) => {
     
 });
 
+router.get('/users', (req, res, next) => {
+    console.log('iski ,aaplsn', req.query.id);
+    Applicant.findById(req.query.id).then((user) => {
+        if (!user) {
+            return res.sendStatus(401);
+        }
+        return res.json(user);
+    }).catch(next);
 
+});
 
 router.post('/login', async (req, res, next) => {
 
@@ -235,41 +260,28 @@ router.get('/user', (req, res, next) => {
     }
 });
 
-// function no_such_post() {
-//     return make_error("no_such_post",
-//         "The specified post does not exist");
-// }
-
-// function make_error(err, msg) {
-//     var e = new Error(msg);
-//     e.code = err;
-//     return e;
-// }
-
 // failure and success
+function send_failure(code, message) {
+    return status(code).json({
+        success: false,
+        errors: {
+            message
+        }
+    })
+}
 
-function send_success(res, data) {
+function send_success(res, data, message) {
     res.writeHead(200, {
         "Content-Type": "application/json"
     });
     var output = {
+        success: true,
         error: null,
-        data: data
+        data: data,
+        message: message
     };
     res.end(JSON.stringify(output) + "\n");
 }
-
-function send_failure(res, server_code, err) {
-    var code = (err.code) ? err.code : err.name;
-    res.writeHead(server_code, {
-        "Content-Type": "application/json"
-    });
-    res.end(JSON.stringify({
-        error: code,
-        message: err.message
-    }) + "\n");
-}
-// failure and success
 
 router.post('/resetPassword',async (req,res)=>{
     const user_details = JSON.parse(JSON.stringify(req.body));
@@ -344,7 +356,7 @@ router.post('/hr', (req, res) => {
                 applicant: applicant.toProfileJSONFor()
             });
         }).catch(err => {
-            console.log(err);  
+            console.log(err);
         });
        
 
@@ -361,7 +373,7 @@ router.post('/hr', (req, res) => {
             });
         }).catch(err => {
             console.log(err);
-            
+
         });
         
     }
@@ -398,7 +410,6 @@ router.put('/v1/hr', (req, res) => {
     } else {
         console.log(new Error('Nothing in: ', user_details_to_add));
     }
-    // console.log(jobModelObj);
 
 })
 
