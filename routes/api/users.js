@@ -47,7 +47,7 @@ router.put('/hrs/update', async (req, res, next) => {
             _id: req.query.hrRef
            }
      post.applicants.push(newRequest)
-     post.save();
+    
     })
     // notifyFunctions.jobNotification(req.query.hrRef);
     if(data){
