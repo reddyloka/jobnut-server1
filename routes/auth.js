@@ -1,6 +1,13 @@
 var jwt = require('jsonwebtoken');
 var secret = require('../config').secret;
 
+function getTokenFromHeader(req){
+    if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'token' ||
+        req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
+      return req.headers.authorization.split(' ')[1];
+    }
+    return null;
+  }
 // function getTokenFromHeader(req){
 //     if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'token' ||
 //         req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {

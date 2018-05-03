@@ -21,6 +21,7 @@ const hrSchema = new Schema({
     city: String,
     phone: String,
     jobProfile: String,
+    experience: Array,
     profile_photo: {
         type: String,
     },

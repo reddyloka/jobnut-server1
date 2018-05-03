@@ -164,4 +164,12 @@ router.get('/', async (req, res, next) => {
     }
 });
 
+router.put('/deleteHrPost',async(req,res)=>{
+    console.log('id',req.query.id);
+  const data=await Post.findByIdAndRemove(req.query.id);
+  return res.json({
+      data:data
+  });
+});
+
 module.exports = router;
