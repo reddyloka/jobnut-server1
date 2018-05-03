@@ -8,8 +8,6 @@ var notifyFunctions = require('./notify');
 
 
 router.get('/hrs', async (req, res, next) => {
-    console.log('data from hr')
-  try{
       console.log('data from hr',req.query.id)
     const user = await Hr.findById(req.query.id)
     if(!user){
@@ -21,9 +19,6 @@ router.get('/hrs', async (req, res, next) => {
         })
     }
     return res.json(user);
-  } catch(e){
-      console.log("data from the hr details",e);
-  }
  
 });
 
@@ -151,10 +146,10 @@ router.get('/users', (req, res, next) => {
 
 
 
-router.post('/login', (req, res, next) => {
+router.post('/login', async (req, res, next) => {
 
     user_details = JSON.parse(JSON.stringify(req.body));
-    console.log('game over', user_details);
+    console.log('user login details', user_details);
     if (!req.body.username) {
         return res.status(422).json({
             success: false,
@@ -173,39 +168,56 @@ router.post('/login', (req, res, next) => {
         })
     }
     if (user_details.isHr) {
-        Hr.findOne({
-            email: user_details.username
-        }).then((user) => {
-            if (!user) {
+        const user=await Hr.findOne({email: user_details.username});
+        if(user){
+            user.decryptPassword(user_details.password).then((user1)=>{
+                console.log('HR password match status',user1);
+            if (!user1) {
                 return res.status(401).json({
                     success: false,
                     errors: {
-                        message: 'Sign Up First!'
+                        message: 'Password Incorrect??'
                     }
                 });
             }
             return res.json({
                 user: user.toAuthJSON()
             });
-        }).catch(next);
-    } else {
-        Applicant.findOne({
-            email: user_details.username
-        }).then((user) => {
-            console.log(' ❌', user, user_details.username)
-            if (!user) {
-                return res.status(401).json({
-                    success: false,
-                    errors: {
-                        message: 'Sign Up First!'
-                    }
+        })
+    } else{
+        return res.status(401).json({
+            success: false,
+            errors: {
+                message: 'Signup first'
+            }
+        });
+    }
 
+    } else {
+        const user=await Applicant.findOne({email: user_details.username});
+           if(user){
+            user.decryptPassword(user_details.password).then((user1)=>{
+                    console.log('Applicant password match status',user1);
+                if (!user1) {
+                    return res.status(401).json({
+                        success: false,
+                        errors: {
+                            message: 'Password Incorrect??'
+                        }
+                    });
+                }
+                return res.json({
+                    user: user.toAuthJSON()
                 });
-            }
-            return res.json({
-                user: user.toAuthJSON()
+            })
+        }else{
+            return res.status(401).json({
+                success: false,
+                errors: {
+                    message: 'Signup first'
+                }
             });
-        }).catch(next);
+        }
     }
 });
 
@@ -259,6 +271,66 @@ router.get('/user', (req, res, next) => {
 // }
 // failure and success
 
+router.post('/resetPassword',async (req,res)=>{
+    const user_details = JSON.parse(JSON.stringify(req.body));
+    console.log('reset userdetails',user_details);
+    if(user_details.isHr){
+        let data=await Hr.findOne({email:user_details.email});
+        let hr = new Hr(data);
+        hr.encryptPassword(user_details.password);
+        hr.save().then((data) => {
+           console.log('hr updated',data);
+           return res.json({
+               data: data
+           });
+        });
+    }
+    else 
+    { 
+     let data=await Applicant.findOne({email:user_details.email});
+     let applicant = new Applicant(data);
+     applicant.encryptPassword(user_details.password);
+     applicant.save().then((data) => {
+        console.log(' applicant updated',data);
+        return res.json({
+            data: data
+        });
+     });
+    }
+})
+
+router.post('/checkMailId',async (req,res)=>{
+    const user_details = JSON.parse(JSON.stringify(req.body));
+    if(!user_details.isHr){
+    let data=await Applicant.findOne({email:user_details.email});
+    console.log(' applicant data',data);
+      if(data){
+        return res.json({
+            data: data,
+            status:true
+        });
+    }else{
+        return res.json({
+            status:false
+        });
+    }
+}
+else if(user_details.isHr){
+    let data=await Hr.findOne({email:user_details.email});
+    console.log(' hr data',data);
+      if(data){
+        return res.json({
+            data: data,
+            status:true
+        });
+    }else{
+        return res.json({
+            status:false
+        });
+    }
+}
+})
+
 router.post('/hr', (req, res) => {
     // res.cookie("SESSIONID", jwtBearerToken, {httpOnly:true, secure:true});
     // console.log('chello', req.body);
@@ -266,7 +338,6 @@ router.post('/hr', (req, res) => {
         const user_details = JSON.parse(JSON.stringify(req.body))
         let applicant = new Applicant(user_details);
         applicant.encryptPassword(user_details.password);
-        // applicant.isApplicant = false;
         applicant.save().then(() => {
             return res.json({
                 applicant: applicant.toProfileJSONFor()
@@ -278,14 +349,13 @@ router.post('/hr', (req, res) => {
         notifyFunctions.signupNotification(user_details.email);
 
     } else if (req.body.isHr) {
-        console.log('chello', req.body);
+        console.log('hr data', req.body);
         const user_details = JSON.parse(JSON.stringify(req.body))
         let hr = new Hr(user_details);
         hr.encryptPassword(user_details.password);
-        hr.save().then(() => {
-            return res.json({
-                hr: hr.toProfileJSONFor()
-            });
+        hr.save().then((data) => {
+            console.log('new data ', data);
+            return send_success(res, hr.toProfileJSONFor(), 'hr Created!');
         }).catch(err => {
             console.log(err);
             

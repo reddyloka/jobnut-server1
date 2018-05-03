@@ -7,9 +7,10 @@ const saltRounds = 10;
 
 const Schema = mongoose.Schema;
 // add the schema
+
 const hrSchema = new Schema({
-    fname: String,
-    lname: String,
+    firstName: String,
+    lastName: String,
     email: String,
     hash: String,
     industry: String,
@@ -40,26 +41,31 @@ const hrSchema = new Schema({
     status: {
         type: Boolean,
         default: false
-    }
+    },
+    // chats: [{
+    //     applicant: {
+    //         isAccepted: Boolean,
+    //         ref: Schema.Types.ObjectId(),
+    //         message: [{
+    //             String,
+    //         }, {timestamp: true} ]
+    //     }
+    // }]
 });
 
 hrSchema.plugin(uniqueValidator, {
     message: 'is already taken '
 });
 
-hrSchema.methods.encryptPassword = function (key) {
-    bcrypt.hash(key, saltRounds).then((hash) => {
-        console.log(' ❌', this.jobsPost)
-        setTimeout(() => {
-            console.log(' ❌', this.jobsPost)
-        }, 5000)
-        return this.password = hash;
-    });
+hrSchema.methods.encryptPassword = async function(key) {
+    const hash = await bcrypt.hash(key, saltRounds)
+    console.log('error is here: ', hash);
+      return this.hash = hash;
 }
 
 
 hrSchema.methods.decryptPassword = function (key) {
-    console.log('key is 🥇', key, this.hash)
+    // console.log('key is 🥇', key, this.hash)
     return bcrypt.compare(key, this.hash);
 }
 
@@ -96,31 +102,5 @@ hrSchema.methods.toProfileJSONFor = function (hr) {
     }
 }
 
-// function addNewUser(userDetails) {
-
-//     // check if user already exists
-
-//     encryptPassword(userDetails['password'])
-//         .then((hash) => {
-//             userDetails['password'] = hash;
-//             return userDetails;
-//             // send_success(res, _userList)
-//         })
-//         .then((jobObj) => {
-//             console.log(true);
-//             console.log('model is : ', jobObj);
-//             jobObj.save()
-//                 .then(() => {
-//                     console.log(true);
-//                     console.log('database saved!');
-//                 }).catch((err) => {
-//                     console.log('error detected');
-//                 })
-//         })
-//         .catch(err => {
-//             console.log('password: error', err);
-//         })
-
-// }
 
 let hrModel = mongoose.model('hrModel', hrSchema);

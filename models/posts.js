@@ -32,7 +32,7 @@ const postSchema = new Schema({
             ref: 'applicantModel'
         },
        isShortlisted:{
-           type:Boolean,
+           type: Boolean,
            default:false
         } 
     }]
