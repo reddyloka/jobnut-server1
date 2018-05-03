@@ -1,7 +1,6 @@
 var jwt = require('jsonwebtoken');
 var secret = require('../config').secret;
 
-<<<<<<< HEAD
 function getTokenFromHeader(req){
     if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'token' ||
         req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
@@ -9,7 +8,6 @@ function getTokenFromHeader(req){
     }
     return null;
   }
-=======
 // function getTokenFromHeader(req){
 //     if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'token' ||
 //         req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
@@ -18,7 +16,6 @@ function getTokenFromHeader(req){
   
 //     return null;
 //   }
->>>>>>> 68d83abfe89d7b5c6b25dbd1d8bc1ce433b0a586
   
 //   var auth = {
 //     required: jwt({

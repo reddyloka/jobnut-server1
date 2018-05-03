@@ -53,11 +53,8 @@ applicantSchema.plugin(uniqueValidator, { message: 'is already taken '});
 
 applicantSchema.methods.encryptPassword = async function(key) {
     const hash = await bcrypt.hash(key, saltRounds)
-<<<<<<< HEAD
-=======
     console.log('error is here: ', hash);
     
->>>>>>> 68d83abfe89d7b5c6b25dbd1d8bc1ce433b0a586
         return this.hash = hash;
 }
 
