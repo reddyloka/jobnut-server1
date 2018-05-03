@@ -4,25 +4,27 @@ const sgMail = require('@sendgrid/mail');
 var Applicant = mongoose.model('applicantModel');
 let mailArray=[];
 
+
 // router.get('/mail',  async (req, res)=> {
 //     let mailArray= await Applicant.find({},['email']);
 //     console.log(mailArray);
-//     sgMail.setApiKey('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');
+//     sgMail.setApiKey('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');
 //     const msg = {
 //         to:mailArray,
-//         from: 'lokaanvesh2@gmail.com',
-//         subject: 'Hello user',
+//         from:'chintareddy.sudhakarreddy@gmail.com',
+//         subject:'Hello user',
 //         html:'<h1>welcome to JobNut</h1><strong>Your are at right place where you can get good job offers</strong>'
 //       };
 //     sgMail.send(msg, (err) => {
 //         if (err)
 //         console.log("error occurred");
-//         console.log("mail sent successfully");
+//         res.send("mail  sent successfully")
+//         // console.log("mail sent successfully");
 //     });
 // });
 
 signupNotification = async function (req){
- sgMail.setApiKey('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');
+ sgMail.setApiKey('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');
     const msg = {
         to:req,
         from: 'chintareddy.sudhakarreddy@gmail.com',
@@ -31,10 +33,9 @@ signupNotification = async function (req){
       };
     sgMail.send(msg, (err) => {
         if (!err)
-        console.log("mail sent successfully");
+        console.log("signup mail sent successfully");
         else
         console.log("error occured");
-
     });
 return true;
 }
@@ -42,25 +43,24 @@ return true;
 jobNotification = async function(req){
     console.log('function',req);
     let mailArray= await Applicant.findById({_id:req},['email']);
-    console.log('mails array',mailArray);
-    sgMail.setApiKey('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');
+    console.log('mail',mailArray);
+    sgMail.setApiKey('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');
     const msg = {
         to:mailArray,
-        from: 'lokaanvesh2@gmail.com',
+        from: 'chintareddy.sudhakarreddy@gmail.com',
         subject: 'Hello user',
         html:'<h1>welcome to JobNut</h1><strong>Your are at right place where you can get good job opporunities</strong>'
       };
     sgMail.send(msg, (err) => {
         if (!err)
-        console.log("mail sent successfully");
+        console.log("job mail sent successfully");
         else
         console.log("error occurred");
-
     });
 return true;
 }
 
- module.exports ={
+ module.exports = {
      jobNotification,
      signupNotification
  }
