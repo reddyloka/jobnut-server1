@@ -351,7 +351,7 @@ router.post('/hr', (req, res) => {
         let applicant = new Applicant(user_details);
         applicant.encryptPassword(user_details.password);
         applicant.save().then(() => {
-            notifyFunctions.signupApplicantNotification(data.email);
+            // notifyFunctions.signupApplicantNotification(data.email);
             return res.json({
                 applicant: applicant.toProfileJSONFor()
             });
@@ -367,7 +367,7 @@ router.post('/hr', (req, res) => {
         hr.encryptPassword(user_details.password);
         hr.save().then((data) => {
             console.log('new data ', data);
-            notifyFunctions.signupHrNotification(data.email);
+            // notifyFunctions.signupHrNotification(data.email);
             return res.json({
                 hr: hr.toProfileJSONFor()
             });

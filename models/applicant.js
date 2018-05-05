@@ -10,6 +10,9 @@ const Schema = mongoose.Schema;
 const applicantSchema = new Schema({
     firstName: String,
     lastName: String,
+    dob: Date,
+    gender: String,
+    phone: String,
     email: {
         type: String,
         // unique: true
@@ -18,11 +21,9 @@ const applicantSchema = new Schema({
         type: String,
         // unique: true
     },
-    dob: Date,
-    phone: String,
-    location: String,
+    state:String,
+    city: String,
     address: String,
-    gender: String,
     education:[],
     experience:[],
     skillValue: Array,
