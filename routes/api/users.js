@@ -42,14 +42,13 @@ router.put('/hrs/update', async (req, res, next) => {
  });
 
  router.put('/users/apply', async (req, res) => {
-    
-    const data = Post.findById(req.query.id).then((post)=>{
-        newRequest={
+    console.log
+    const data =  await Post.findByIdAndUpdate(req.query.id, {
+        $push: { applicants: {
             _id: req.query.hrRef
-           }
-     post.applicants.push(newRequest)
-     post.save();
-    })
+           }}
+      })
+    // notifyFunctions.jobNotification(req.query.hrRef);
     if(data){
         console.log('success')
     return res.json(data);
