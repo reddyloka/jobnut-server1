@@ -511,14 +511,10 @@ router.post('/user/upload-profile', upload.any(), async (req, res, next) => {
         file = req.files[0];
         // console.log('file is: ', req.files[0]);
         const extention = await path.extname(file.originalname);
-        // if(!acceptaableExtention(extention)) {
-        //     fs.unlink(file.path);
-        //     return;   
-        // }
 
         const final_fn = file.filename + extention;
 
-        console.log(':::', final_fn, '  :: ', file.path)
+        // console.log(':::', final_fn, '  :: ', file.path)
         if (file.fieldname == 'profile_photo') {
             
             console.log('insde system::');
@@ -529,14 +525,14 @@ router.post('/user/upload-profile', upload.any(), async (req, res, next) => {
                 profile_photo: final_fn
             });
         }else {
-
+            // fs.unlink(file.path)
+            // return;
         }
 
-        
         console.log(fs.renameSync(file.path, 'D:/Users/mitta/Desktop/Jobnut/jobnut-server/static/images/' + final_fn));
-        
-        console.log('user is :mlmlm ', user.email, user.profile_photo)
-        return send_success(res,final_fn,'profile pic uploaded!')
+        return send_success(res,final_fn,'profile pic uploaded!');
+        fs.unlinkSync(file.path);
+        // console.log('user is :mlmlm ', user.email, user.profile_photo)
     } catch (error) {
 
     }
