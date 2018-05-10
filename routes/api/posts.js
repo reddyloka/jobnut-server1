@@ -20,12 +20,12 @@ router.put('/shortlist', async (req, res, next) => {
     console.log("upadted AAAAAAAAAAA",req.query.hrRef)
     console.log("upadted AAAAAAAAAAA",req.body)
 
-      const data = await Post.findByIdAndUpdate(req.query.id,{ $set: {applicants: {
-          _id: req.query.hrRef,
-          isShortlisted: req.body.isShortlisted 
-        } }})
+      const data = await Post.findOneAndUpdate({'_id':req.query.id,'applicants._id': req.query.hrRef},
+        { '$set': {
+            'applicants.$.isShortlisted': req.body.isShortlisted 
+        }
+    })
        if(data){
-           console.log('as')
         res.json(data)
        }
  });
@@ -162,6 +162,14 @@ router.get('/', async (req, res, next) => {
     } catch (error) {
         console.log('Error', error);
     }
+});
+
+router.put('/deleteHrPost',async(req,res)=>{
+    console.log('id',req.query.id);
+  const data=await Post.findByIdAndRemove(req.query.id);
+  return res.json({
+      data:data
+  });
 });
 
 module.exports = router;

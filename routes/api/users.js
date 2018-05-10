@@ -10,6 +10,7 @@ var auth = require('../auth'),
     multer = require('multer');
 // const authenticate = require('../../_middleware/check-auth');
 var Post = mongoose.model('postModel');
+// var upload = multer({ dest: 'uploads/' });
 var notifyFunctions = require('./notify');
 
 var upload = multer({ dest: 'uploads/'});
@@ -31,10 +32,15 @@ router.get('/hrs', async (req, res, next) => {
 });
 
 router.put('/hrs/update', async (req, res, next) => {
-    console.log("upadted AAAAAAAAAAA",req.query.id)
+    console.log("in hr upadted fn", req.query.id)
     const data = await Hr.findByIdAndUpdate(req.query.id, req.body)
-    if(!data){
-        // eror
+    if (!data) {
+        return res.status(401).json({
+            success: false,
+            errors: {
+                message: 'User Doesn\'t Exist!'
+            }
+        })
     }
     return res.json(
         {
@@ -44,14 +50,12 @@ router.put('/hrs/update', async (req, res, next) => {
  });
 
  router.put('/users/apply', async (req, res) => {
-    
-    const data = Post.findById(req.query.id).then((post)=>{
-        newRequest={
+    console.log
+    const data =  await Post.findByIdAndUpdate(req.query.id, {
+        $push: { applicants: {
             _id: req.query.hrRef
-           }
-     post.applicants.push(newRequest)
-     post.save();
-    })
+           }}
+      })
     // notifyFunctions.jobNotification(req.query.hrRef);
     if(data){
         console.log('success')
@@ -68,26 +72,40 @@ router.put('/hrs/update', async (req, res, next) => {
     }
     console.log('main',data)
     return res.json(data);
- });
+});
 
+router.put('/hrs/expUpdate', async (req, res, next) => {
+    console.log("in upadted experience", req.query.id)
+    console.log('data in body',req.body);
 
- router.put('/hrs/expUpdate', async (req, res, next) => {
-    console.log("upadted AAAAAAAAAAA",req.query.id)
-    const data = await Hr.findById(req.query.id).then((user)=> {
-        user.experience.push(req.body);
-        user.save()
-    })
-    // data.save()
-    if(!data){
-        // eror
+    const data = await Hr.findByIdAndUpdate(req.query.id, {'experience': req.body})
+
+    if (!data) {
+        return res.sendStatus(401);
     }
     return res.json(
         {
             data: data
         }
     )
- });
+});
 
+router.put('/hrs/skillsUpdate', async (req, res, next) => {
+    console.log("in upadted skills", req.query.id)
+    try {
+        const data = await Hr.findByIdAndUpdate(req.query.id, {'skillValue': req.body.skills})
+        if (!data) {
+            return res.sendStatus(401);
+        }
+        return res.json(
+            {
+                data: data
+            }
+        )
+    } catch (error) {
+        console.log('Error', error);
+    }
+});
 
 router.put('/users/update', async (req, res, next) => {
     console.log("upadted AAAAAAAAAAA",req.query.id)
@@ -102,31 +120,31 @@ router.put('/users/update', async (req, res, next) => {
     )
  });
 
- router.put('/users/eduUpdate', async (req, res, next) => {
-    console.log("upadted AAAAAAAAAAA",req.query.id)
-    const data = await Applicant.findById(req.query.id).then((user)=> {
-        user.education.push(req.body);
-        user.save()
-    })
-    if(!data){
-        // eror
+router.put('/users/eduUpdate', async (req, res, next) => {
+    console.log("upadted AAAAAAAAAAA", req.query.id)
+    const data = await Applicant.findById(req.query.id)
+   
+    if (!data) {
+        return res.sendStatus(401);
+    }else{
+        data.education.push(req.body);
+        data.save()
     }
     return res.json(
         {
             data: data
         }
     )
- });
+});
 
- router.put('/users/expUpdate', async (req, res, next) => {
-    console.log("upadted AAAAAAAAAAA",req.query.id)
-    const data = await Applicant.findById(req.query.id).then((user)=> {
-        user.experience.push(req.body);
-        user.save()
-    })
-    // data.save()
-    if(!data){
-        // eror
+router.put('/users/expUpdate', async (req, res, next) => {
+    console.log("upadted AAAAAAAAAAA", req.query.id)
+    const data = await Applicant.findById(req.query.id)
+    if (!data) {
+      
+    }else{
+        data.experience.push(req.body);
+        data.save()
     }
     return res.json(
         {
@@ -152,7 +170,16 @@ router.get('/users', (req, res, next) => {
     
 });
 
+router.get('/users', (req, res, next) => {
+    console.log('iski ,aaplsn', req.query.id);
+    Applicant.findById(req.query.id).then((user) => {
+        if (!user) {
+            return res.sendStatus(401);
+        }
+        return res.json(user);
+    }).catch(next);
 
+});
 
 router.post('/login', async (req, res, next) => {
 
@@ -243,41 +270,28 @@ router.get('/user', (req, res, next) => {
     }
 });
 
-// function no_such_post() {
-//     return make_error("no_such_post",
-//         "The specified post does not exist");
-// }
-
-// function make_error(err, msg) {
-//     var e = new Error(msg);
-//     e.code = err;
-//     return e;
-// }
-
 // failure and success
+function send_failure(code, message) {
+    return status(code).json({
+        success: false,
+        errors: {
+            message
+        }
+    })
+}
 
-// function send_success(res, data) {
-//     res.writeHead(200, {
-//         "Content-Type": "application/json"
-//     });
-//     var output = {
-//         error: null,
-//         data: data
-//     };
-//     res.end(JSON.stringify(output) + "\n");
-// }
-
-// function send_failure(res, server_code, err) {
-//     var code = (err.code) ? err.code : err.name;
-//     res.writeHead(server_code, {
-//         "Content-Type": "application/json"
-//     });
-//     res.end(JSON.stringify({
-//         error: code,
-//         message: err.message
-//     }) + "\n");
-// }
-// failure and success
+function send_success(res, data, message) {
+    res.writeHead(200, {
+        "Content-Type": "application/json"
+    });
+    var output = {
+        success: true,
+        error: null,
+        data: data,
+        message: message
+    };
+    res.end(JSON.stringify(output) + "\n");
+}
 
 function send_success(res, data, message) {
     res.writeHead(200, {
@@ -360,14 +374,14 @@ router.post('/hr', (req, res) => {
         let applicant = new Applicant(user_details);
         applicant.encryptPassword(user_details.password);
         applicant.save().then(() => {
+            // notifyFunctions.signupApplicantNotification(data.email);
             return res.json({
                 applicant: applicant.toProfileJSONFor()
             });
         }).catch(err => {
-            console.log(err);  
+            console.log(err);
         });
-        console.log('user mail',user_details.email);
-        notifyFunctions.signupNotification(user_details.email);
+       
 
     } else if (req.body.isHr) {
         console.log('hr data', req.body);
@@ -376,13 +390,15 @@ router.post('/hr', (req, res) => {
         hr.encryptPassword(user_details.password);
         hr.save().then((data) => {
             console.log('new data ', data);
-            return send_success(res, hr.toProfileJSONFor(), 'hr Created!');
+            // notifyFunctions.signupHrNotification(data.email);
+            return res.json({
+                hr: hr.toProfileJSONFor()
+            });
         }).catch(err => {
             console.log(err);
-            
+
         });
-        console.log('hr mail',user_details.email);
-        notifyFunctions.signupNotification(user_details.email);
+        
     }
 });
 
@@ -417,7 +433,6 @@ router.put('/v1/hr', (req, res) => {
     } else {
         console.log(new Error('Nothing in: ', user_details_to_add));
     }
-    // console.log(jobModelObj);
 
 })
 
