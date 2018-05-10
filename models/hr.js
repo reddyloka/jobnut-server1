@@ -42,6 +42,16 @@ const hrSchema = new Schema({
         type: Boolean,
         default: false
     },
+    chats: [{
+        _from: {
+            type: Schema.Types.ObjectId,
+            ref: 'messageModel'
+        },
+        _to: {
+            type: Schema.Types.ObjectId,
+            ref: 'messageModel'
+        }
+    }]
     // chats: [{
     //     applicant: {
     //         isAccepted: Boolean,
