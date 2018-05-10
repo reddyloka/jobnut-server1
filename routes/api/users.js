@@ -498,6 +498,9 @@ router.post('/user/upload-profile', upload.any(), async (req, res, next) => {
             send_failure(404, 'no such user!');
         }
         console.log('user is : ', user.email, user.profile_photo)
+        if (fs.existsSync('D:/Users/mitta/Desktop/Jobnut/jobnut-server/static/images/' + user.profile_photo)) {
+            fs.unlinkSync('D:/Users/mitta/Desktop/Jobnut/jobnut-server/static/images/' + user.profile_photo);
+        }
         user.profile_photo = null;
 
         if (!req.files) {
@@ -530,8 +533,10 @@ router.post('/user/upload-profile', upload.any(), async (req, res, next) => {
         }
 
         console.log(fs.renameSync(file.path, 'D:/Users/mitta/Desktop/Jobnut/jobnut-server/static/images/' + final_fn));
+        if(fs.existsSync(file.path)){
+            fs.unlinkSync(file.path);
+        }
         return send_success(res,final_fn,'profile pic uploaded!');
-        fs.unlinkSync(file.path);
         // console.log('user is :mlmlm ', user.email, user.profile_photo)
     } catch (error) {
 
