@@ -341,6 +341,61 @@ else if(user_details.isHr){
     }
 }
 })
+router.post('/checkPassword',async (req,res)=>{
+    const user_details = JSON.parse(JSON.stringify(req.body));
+    let user=await Applicant.findOne({_id:user_details.id});
+    if(!user){
+         user=await Hr.findOne({_id:user_details.id});
+    }
+    console.log('applicant status',user.isApplicant);
+    console.log('hr status',user.isHr);
+
+    if(user.isApplicant){
+        user.decryptPassword(user_details.currentPassword).then((user1)=>{
+                console.log('Applicant password match status',user1);
+            if (!user1) {
+                return res.json({
+                    status: false,
+                    errors: {
+                        message: 'Current Password Incorrect??'
+                    }
+                });
+            }
+            else{
+                let applicant = new Applicant(user);
+                applicant.encryptPassword(user_details.newPassword);
+                applicant.save().then((data) => {
+                   return res.json({
+                       status:true
+                   });
+                });
+            }            
+        });
+        }
+        else if(user.isHr){
+            user.decryptPassword(user_details.currentPassword).then((user1)=>{
+                console.log('hr password match status',user1);
+            if (!user1) {
+                return res.json({
+                    status: false,
+                    errors: {
+                        message: 'Current Password Incorrect??'
+                    }
+                });
+            }
+            else{
+                let hr = new Hr(user);
+                hr.encryptPassword(user_details.newPassword);
+                hr.save().then((data) => {
+                   return res.json({
+                       status:true
+                   });
+                });
+            }            
+        });
+        }
+  
+});
 
 router.post('/hr', (req, res) => {
     // res.cookie("SESSIONID", jwtBearerToken, {httpOnly:true, secure:true});
