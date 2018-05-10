@@ -112,40 +112,6 @@ router.put('/users/update', async (req, res, next) => {
     )
  });
 
-router.put('/users/eduUpdate', async (req, res, next) => {
-    console.log("upadted AAAAAAAAAAA", req.query.id)
-    const data = await Applicant.findById(req.query.id)
-   
-    if (!data) {
-        return res.sendStatus(401);
-    }else{
-        data.education.push(req.body);
-        data.save()
-    }
-    return res.json(
-        {
-            data: data
-        }
-    )
-});
-
-router.put('/users/expUpdate', async (req, res, next) => {
-    console.log("upadted AAAAAAAAAAA", req.query.id)
-    const data = await Applicant.findById(req.query.id)
-    if (!data) {
-      
-    }else{
-        data.experience.push(req.body);
-        data.save()
-    }
-    return res.json(
-        {
-            data: data
-        }
-    )
- });
-
-
 router.get('/users', (req, res, next) => {
    console.log(req.query.id);
     // if (user_details.isHr && user_details.status) {
