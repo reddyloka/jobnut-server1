@@ -20,12 +20,12 @@ router.put('/shortlist', async (req, res, next) => {
     console.log("upadted AAAAAAAAAAA",req.query.hrRef)
     console.log("upadted AAAAAAAAAAA",req.body)
 
-      const data = await Post.findByIdAndUpdate(req.query.id,{ $set: {applicants: {
-          _id: req.query.hrRef,
-          isShortlisted: req.body.isShortlisted 
-        } }})
+      const data = await Post.findOneAndUpdate({'_id':req.query.id,'applicants._id': req.query.hrRef},
+        { '$set': {
+            'applicants.$.isShortlisted': req.body.isShortlisted 
+        }
+    })
        if(data){
-           console.log('as')
         res.json(data)
        }
  });

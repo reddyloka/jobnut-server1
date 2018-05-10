@@ -36,6 +36,7 @@ var auth = (req, res, next) => {
       const token = req.query.token;
       console.log('bodyknkk is: ', req.query);
       var decoded = jwt.verify(req.query.token, secret);
+      console.log("decode",decoded)
       req.userData = decoded;
       // await console.log('DECODEDS is: ', jwt.verify(req.query.token, secret));
       next()
