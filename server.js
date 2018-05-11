@@ -47,6 +47,7 @@ require('./models/posts');
 // require('./config/passport');
 
 app.use(require('./routes'));
+// app.use(require('./socket/socket'));
 
 /// catch 404 and forward to error handler
 app.use(function(req, res, next) {

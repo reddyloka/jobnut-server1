@@ -47,6 +47,16 @@ const applicantSchema = new Schema({
     jobApplied: [{
         type: Schema.Types.ObjectId,
         ref: 'postModel'
+    }],
+    chats: [{
+        _from: {
+            type: Schema.Types.ObjectId,
+            ref: 'messageModel'
+        },
+        _to: {
+            type: Schema.Types.ObjectId,
+            ref: 'messageModel'
+        }
     }]
 });
 

@@ -72,7 +72,7 @@ router.get('/:post_id', async (req, res, next) => {
     try {
         user_details = JSON.parse(JSON.stringify(req.body));
         const user = await Post.findOne({ _id: req.params.post_id })
-        .populate('applicants._id')
+        .populate('applicants._id').populate('hrRef')
         if (!user) {
             return res.sendStatus(401);
         }

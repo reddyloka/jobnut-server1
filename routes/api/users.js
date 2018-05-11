@@ -1,12 +1,20 @@
+
+const path = require('path');
+const fs = require('fs');
+const express = require('express');
 var mongoose = require('mongoose');
 var router = require('express').Router();
 var Hr = mongoose.model('hrModel');
 var Applicant = mongoose.model('applicantModel');
-var auth = require('../auth');
+var auth = require('../auth'),
+    multer = require('multer');
+// const authenticate = require('../../_middleware/check-auth');
 var Post = mongoose.model('postModel');
 // var upload = multer({ dest: 'uploads/' });
 var notifyFunctions = require('./notify');
-// router.use(express.static(__dirname + '/../static'));
+
+var upload = multer({ dest: 'uploads/'});
+router.use(express.static(__dirname + '/../static'));
 
 router.get('/hrs', async (req, res, next) => {
       console.log('data from hr',req.query.id)
@@ -251,6 +259,19 @@ function send_success(res, data, message) {
     res.end(JSON.stringify(output) + "\n");
 }
 
+function send_success(res, data, message) {
+    res.writeHead(200, {
+        "Content-Type": "application/json"
+    });
+    var output = {
+        success: true,
+        error: null,
+        data: data,
+        message: message
+    };
+    res.end(JSON.stringify(output) + "\n");
+}
+
 router.post('/resetPassword',async (req,res)=>{
     const user_details = JSON.parse(JSON.stringify(req.body));
     console.log('reset userdetails',user_details);
@@ -476,5 +497,73 @@ function addNewPost(postObj) {
         })
 
 }
+
+// do not try to touch or delete it :angry:
+
+router.post('/user/upload-profile', upload.any(), async (req, res, next) => {
+    try {
+        console.log('iefenside', req.query);
+        let user;
+        if ( req.query.isHr ) {
+            console.log('user is hr', req.query.isHr);
+            user = await Hr.findById(req.query.id)
+            console.log(req.query.id)
+        } else if (req.query.isApplicant) {
+            console.log('user is applicant');            
+            user = await Applicant.findById(req.query.id)
+        } else {
+            throw new Error('Unauthorized Attempt.');
+        }
+
+        if (!user) {
+            send_failure(404, 'no such user!');
+        }
+        console.log('user is : ', user.email, user.profile_photo)
+        if (fs.existsSync('D:/Users/mitta/Desktop/Jobnut/jobnut-server/static/images/' + user.profile_photo)) {
+            fs.unlinkSync('D:/Users/mitta/Desktop/Jobnut/jobnut-server/static/images/' + user.profile_photo);
+        }
+        user.profile_photo = null;
+
+        if (!req.files) {
+            console.log('no files');
+
+            return;
+        }
+
+        console.log('files are : ', req.files);
+        
+        file = req.files[0];
+        // console.log('file is: ', req.files[0]);
+        const extention = await path.extname(file.originalname);
+
+        const final_fn = file.filename + extention;
+
+        // console.log(':::', final_fn, '  :: ', file.path)
+        if (file.fieldname == 'profile_photo') {
+            
+            console.log('insde system::');
+            if ( user.isHr ) await Hr.findByIdAndUpdate(req.query.id, {
+                profile_photo: final_fn
+            });
+            if ( user.isApplicant ) await Applicant.findByIdAndUpdate(req.query.id, {
+                profile_photo: final_fn
+            });
+        }else {
+            // fs.unlink(file.path)
+            // return;
+        }
+
+        console.log(fs.renameSync(file.path, 'D:/Users/mitta/Desktop/Jobnut/jobnut-server/static/images/' + final_fn));
+        if(fs.existsSync(file.path)){
+            fs.unlinkSync(file.path);
+        }
+        return send_success(res,final_fn,'profile pic uploaded!');
+        // console.log('user is :mlmlm ', user.email, user.profile_photo)
+    } catch (error) {
+
+    }
+})
+
+// do not try to touch or delete it :angry:
 
 module.exports = router;
