@@ -504,11 +504,11 @@ router.post('/user/upload-profile', upload.any(), async (req, res, next) => {
     try {
         console.log('iefenside', req.query);
         let user;
-        if ( req.query.isHr ) {
+        if ( req.query.isHr === 'true' ) {
             console.log('user is hr', req.query.isHr);
             user = await Hr.findById(req.query.id)
             console.log(req.query.id)
-        } else if (req.query.isApplicant) {
+        } else if (Boolean(req.query.isApplicant === 'true')) {
             console.log('user is applicant');            
             user = await Applicant.findById(req.query.id)
         } else {
