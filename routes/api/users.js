@@ -74,38 +74,9 @@ router.put('/hrs/update', async (req, res, next) => {
     return res.json(data);
 });
 
-router.put('/hrs/expUpdate', async (req, res, next) => {
-    console.log("in upadted experience", req.query.id)
-    console.log('data in body',req.body);
 
-    const data = await Hr.findByIdAndUpdate(req.query.id, {'experience': req.body})
 
-    if (!data) {
-        return res.sendStatus(401);
-    }
-    return res.json(
-        {
-            data: data
-        }
-    )
-});
 
-router.put('/hrs/skillsUpdate', async (req, res, next) => {
-    console.log("in upadted skills", req.query.id)
-    try {
-        const data = await Hr.findByIdAndUpdate(req.query.id, {'skillValue': req.body.skills})
-        if (!data) {
-            return res.sendStatus(401);
-        }
-        return res.json(
-            {
-                data: data
-            }
-        )
-    } catch (error) {
-        console.log('Error', error);
-    }
-});
 
 router.put('/users/update', async (req, res, next) => {
     console.log("upadted AAAAAAAAAAA",req.query.id)
