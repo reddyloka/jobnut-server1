@@ -26,7 +26,7 @@ router.put('/shortlist', async (req, res, next) => {
         }
     })
        if(data){
-        res.json(data)
+        res.json(data);
        }
  });
 router.get('/all/post', async (req, res, next) => {
@@ -36,9 +36,7 @@ router.get('/all/post', async (req, res, next) => {
         if (!data) {
             return res.sendStatus(401);
         }
-        return res.json({
-            data: data
-        });
+        return res.json(data);
     }
     catch (error) {
         console.log('Error', error);
@@ -56,7 +54,7 @@ router.put('/update', async (req, res, next) => {
         }
         console.log(data);
         
-        return res.json(data)
+        return res.json(data);
     }
     catch (error) {
         console.log('Error', error);
