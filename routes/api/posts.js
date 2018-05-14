@@ -72,9 +72,7 @@ router.get('/:post_id', async (req, res, next) => {
         if (!user) {
             return res.sendStatus(401);
         }
-        return res.json({
-            data: user
-        });
+        return res.json(user);
     }
     catch (error) {
         console.log('Error', error);

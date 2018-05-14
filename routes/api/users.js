@@ -42,11 +42,7 @@ router.put('/hrs/update', async (req, res, next) => {
             }
         })
     }
-    return res.json(
-        {
-            data: data
-        }
-    )
+    return res.json(data)
  });
 
  router.put('/users/apply', async (req, res) => {
@@ -80,11 +76,7 @@ router.put('/users/update', async (req, res, next) => {
     if(!data){
         console.log('fail')
     }
-    return res.json(
-        {
-            data: data
-        }
-    )
+    return res.json(data)
  });
 
 router.get('/users', (req, res, next) => {
@@ -189,19 +181,19 @@ router.post('/login', async (req, res, next) => {
     }
 });
 
-router.get('/user', (req, res, next) => {
-    user_details = JSON.parse(JSON.stringify(req.body));
-    if (user_details.isHr && user_details.status) {
-        Applicant.find().then((user) => {
-            if (!user) {
-                return res.sendStatus(401);
-            }
-            return res.json({
-                user: user
-            });
-        }).catch(next);
-    }
-});
+// router.get('/user', (req, res, next) => {
+//     user_details = JSON.parse(JSON.stringify(req.body));
+//     if (user_details.isHr && user_details.status) {
+//         Applicant.find().then((user) => {
+//             if (!user) {
+//                 return res.sendStatus(401);
+//             }
+//             return res.json({
+//                 user: user
+//             });
+//         }).catch(next);
+//     }
+// });
 
 // failure and success
 function send_failure(code, message) {
@@ -424,46 +416,6 @@ router.put('/v1/hr', (req, res) => {
 
 })
 
-router.get('/v1/posts', (req, res) => {
-    postModel.find((err, result) => {
-        send_success(res, result);
-    })
-})
-
-router.get('/v1/posts/:post_id', (req, res) => {
-    var post_id = req.params.post_id;
-    // console.log(' ❌ ', req.params.post_id);
-
-    postModel.findOne({
-        _id: post_id
-    }, (err, result) => {
-        if (err) {
-            send_failure(res, 404, no_such_post());
-        }
-        console.log(' ❌ ', result);
-        send_success(res, result);
-        // return;
-    })
-})
-
-router.put('/posts', (req, res) => {
-    var post_details_to_add = JSON.parse(JSON.stringify(req.body));
-    postModelObj = new postModel(post_details_to_add);
-    addNewPost(postModelObj);
-    // send_success(res, resu)
-})
-
-function addNewPost(postObj) {
-    console.log(' 💤 ', postObj);
-    postObj.save()
-        .then(() => {
-            console.log(true);
-            console.log('database saved!');
-        }).catch((err) => {
-            console.log('error detected');
-        })
-
-}
 
 // do not try to touch or delete it :angry:
 
