@@ -50,12 +50,13 @@ router.put('/hrs/update', async (req, res, next) => {
  });
 
  router.put('/users/apply', async (req, res) => {
-    console.log
+    console.log('req',req.query)
     const data =  await Post.findByIdAndUpdate(req.query.id, {
         $push: { applicants: {
             _id: req.query.hrRef
            }}
       })
+      console.log(' apply data',data);
     // notifyFunctions.jobNotification(req.query.hrRef);
     if(data){
         console.log('success')
@@ -77,18 +78,13 @@ router.put('/hrs/update', async (req, res, next) => {
 
 
 
-
 router.put('/users/update', async (req, res, next) => {
     console.log("upadted AAAAAAAAAAA",req.query.id)
     const data = await Applicant.findByIdAndUpdate(req.query.id, req.body)
     if(!data){
         console.log('fail')
     }
-    return res.json(
-        {
-            data: data
-        }
-    )
+    return res.json(data);
  });
 
 router.get('/users', (req, res, next) => {
@@ -102,9 +98,6 @@ router.get('/users', (req, res, next) => {
     }).catch(next);
     
     // }
-
-
-    
 });
 
 router.get('/users', (req, res, next) => {
@@ -200,9 +193,7 @@ router.get('/user', (req, res, next) => {
             if (!user) {
                 return res.sendStatus(401);
             }
-            return res.json({
-                user: user
-            });
+            return res.json(user);
         }).catch(next);
     }
 });
@@ -252,9 +243,7 @@ router.post('/resetPassword',async (req,res)=>{
         hr.encryptPassword(user_details.password);
         hr.save().then((data) => {
            console.log('hr updated',data);
-           return res.json({
-               data: data
-           });
+           return res.json(data);
         });
     }
     else 
@@ -264,9 +253,7 @@ router.post('/resetPassword',async (req,res)=>{
      applicant.encryptPassword(user_details.password);
      applicant.save().then((data) => {
         console.log(' applicant updated',data);
-        return res.json({
-            data: data
-        });
+        return res.json(data);
      });
     }
 })
@@ -301,8 +288,8 @@ else if(user_details.isHr){
         });
     }
 }
-})
-router.post('/checkPassword',async (req,res)=>{
+});
+router.post('/changePassword',async (req,res)=>{
     const user_details = JSON.parse(JSON.stringify(req.body));
     let user=await Applicant.findOne({_id:user_details.id});
     if(!user){
@@ -466,7 +453,6 @@ function addNewPost(postObj) {
         }).catch((err) => {
             console.log('error detected');
         })
-
 }
 
 // do not try to touch or delete it :angry:
