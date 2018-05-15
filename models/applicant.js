@@ -23,6 +23,7 @@ const applicantSchema = new Schema({
     },
     state:String,
     city: String,
+    country:String,
     address: String,
     education:[],
     experience:[],
