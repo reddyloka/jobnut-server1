@@ -16,7 +16,7 @@ const sgMail = require('@sendgrid/mail');
             if (!err)
             console.log('mail sent successfully');
             else
-            console.log('error');
+            console.log(' mail error');
         });
     }
     jobApplyNotification=function (req,res){
@@ -32,7 +32,7 @@ const sgMail = require('@sendgrid/mail');
             if (!err)
             console.log('mail sent successfully');
             else
-            console.log('error');
+            console.log('mail error');
         });
     }
     signupHrNotification=function (req,res){
@@ -48,7 +48,7 @@ const sgMail = require('@sendgrid/mail');
             if (!err)
             console.log('mail sent successfully');
             else
-            console.log('error');
+            console.log('mail error');
         });
     }
     passwordUpdateNotification=function (req,res){
@@ -64,7 +64,7 @@ const sgMail = require('@sendgrid/mail');
             if (!err)
             console.log('mail sent successfully');
             else
-            console.log('error');
+            console.log('mail error');
         });
     }
     module.exports={
