@@ -373,40 +373,6 @@ router.post('/hr', (req, res) => {
     }
 });
 
-router.put('/v1/hr', (req, res) => {
-    var user_details_to_add = JSON.parse(JSON.stringify(req.body));
-    console.log(user_details_to_add);
-
-    if (user_details_to_add.isApplicant) {
-        applicantModel.findOne({
-            email: user_details_to_add.email
-        }, (err, reply) => {
-            if (!err, reply) {
-                console.log('user exist!');
-                return false
-            }
-            // next();
-        })
-        applicantModelObj = new applicantModel(user_details_to_add);
-        addNewUser(applicantModelObj);
-    } else if (user_details_to_add.isHr) {
-        hrModel.findOne({
-            email: user_details_to_add.email
-        }, (err, reply) => {
-            if (!err, reply) {
-                console.log('user exist!');
-                return false
-            }
-            // next();
-        })
-        hrModelObj = new hrModel(user_details_to_add);
-        addNewUser(hrModelObj);
-    } else {
-        console.log(new Error('Nothing in: ', user_details_to_add));
-    }
-
-})
-
 
 // do not try to touch or delete it :angry:
 
