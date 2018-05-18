@@ -29,7 +29,7 @@ router.put('/shortlist', async (req, res, next) => {
         }
     })
        if(data){
-        res.json(data)
+        res.json(data);
        }
  });
 router.get('/all/post', async (req, res, next) => {

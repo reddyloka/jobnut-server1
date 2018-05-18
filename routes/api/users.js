@@ -44,22 +44,20 @@ router.put('/hrs/update', async (req, res, next) => {
             }
         })
     }
-    return res.json(
-        {
-            data: data
-        }
-    )
+    return res.json(data)
  });
 
  router.put('/users/apply', async (req, res) => {
-    console.log
+    console.log('req',req.query)
     const data =  await Post.findByIdAndUpdate(req.query.id, {
         $push: { applicants: {
             _id: req.query.hrRef
            }}
       })
-    // notifyFunctions.jobNotification(req.query.hrRef);
+      console.log(' apply data',data);
+   
     if(data){
+        notifyFunctions.jobApplyNotification(req.query.hrRef);
         console.log('success')
     return res.json(data);
     }else{
@@ -76,21 +74,13 @@ router.put('/hrs/update', async (req, res, next) => {
     return res.json(data);
 });
 
-
-
-
-
 router.put('/users/update', async (req, res, next) => {
     console.log("upadted AAAAAAAAAAA",req.query.id)
     const data = await Applicant.findByIdAndUpdate(req.query.id, req.body)
     if(!data){
         console.log('fail')
     }
-    return res.json(
-        {
-            data: data
-        }
-    )
+    return res.json(data)
  });
 
 router.get('/users', (req, res, next) => {
@@ -104,21 +94,8 @@ router.get('/users', (req, res, next) => {
     }).catch(next);
     
     // }
-
-
-    
 });
 
-router.get('/users', (req, res, next) => {
-    console.log('iski ,aaplsn', req.query.id);
-    Applicant.findById(req.query.id).then((user) => {
-        if (!user) {
-            return res.sendStatus(401);
-        }
-        return res.json(user);
-    }).catch(next);
-
-});
 
 router.post('/login', async (req, res, next) => {
 
@@ -195,19 +172,19 @@ router.post('/login', async (req, res, next) => {
     }
 });
 
-router.get('/user', (req, res, next) => {
-    user_details = JSON.parse(JSON.stringify(req.body));
-    if (user_details.isHr && user_details.status) {
-        Applicant.find().then((user) => {
-            if (!user) {
-                return res.sendStatus(401);
-            }
-            return res.json({
-                user: user
-            });
-        }).catch(next);
-    }
-});
+// router.get('/user', (req, res, next) => {
+//     user_details = JSON.parse(JSON.stringify(req.body));
+//     if (user_details.isHr && user_details.status) {
+//         Applicant.find().then((user) => {
+//             if (!user) {
+//                 return res.sendStatus(401);
+//             }
+//             return res.json({
+//                 user: user
+//             });
+//         }).catch(next);
+//     }
+// });
 
 // failure and success
 function send_failure(code, message) {
@@ -254,9 +231,8 @@ router.post('/resetPassword',async (req,res)=>{
         hr.encryptPassword(user_details.password);
         hr.save().then((data) => {
            console.log('hr updated',data);
-           return res.json({
-               data: data
-           });
+           notifyFunctions.passwordUpdateNotification(data.email);
+           return res.json(data);
         });
     }
     else 
@@ -266,9 +242,8 @@ router.post('/resetPassword',async (req,res)=>{
      applicant.encryptPassword(user_details.password);
      applicant.save().then((data) => {
         console.log(' applicant updated',data);
-        return res.json({
-            data: data
-        });
+        notifyFunctions.passwordUpdateNotification(data.email);
+        return res.json(data);
      });
     }
 })
@@ -303,8 +278,8 @@ else if(user_details.isHr){
         });
     }
 }
-})
-router.post('/checkPassword',async (req,res)=>{
+});
+router.post('/changePassword',async (req,res)=>{
     const user_details = JSON.parse(JSON.stringify(req.body));
     let user=await Applicant.findOne({_id:user_details.id});
     if(!user){
@@ -328,6 +303,7 @@ router.post('/checkPassword',async (req,res)=>{
                 let applicant = new Applicant(user);
                 applicant.encryptPassword(user_details.newPassword);
                 applicant.save().then((data) => {
+                    notifyFunctions.passwordUpdateNotification(data.email);
                    return res.json({
                        status:true
                    });
@@ -350,6 +326,7 @@ router.post('/checkPassword',async (req,res)=>{
                 let hr = new Hr(user);
                 hr.encryptPassword(user_details.newPassword);
                 hr.save().then((data) => {
+                    notifyFunctions.passwordUpdateNotification(data.email);
                    return res.json({
                        status:true
                    });
@@ -367,8 +344,8 @@ router.post('/hr', (req, res) => {
         const user_details = JSON.parse(JSON.stringify(req.body))
         let applicant = new Applicant(user_details);
         applicant.encryptPassword(user_details.password);
-        applicant.save().then(() => {
-            // notifyFunctions.signupApplicantNotification(data.email);
+        applicant.save().then((data) => {
+            notifyFunctions.signupNotification(data.email);
             return res.json({
                 applicant: applicant.toProfileJSONFor()
             });
@@ -384,7 +361,7 @@ router.post('/hr', (req, res) => {
         hr.encryptPassword(user_details.password);
         hr.save().then((data) => {
             console.log('new data ', data);
-            // notifyFunctions.signupHrNotification(data.email);
+            notifyFunctions.signupHrNotification(data.email);
             return res.json({
                 hr: hr.toProfileJSONFor()
             });
@@ -430,46 +407,6 @@ router.put('/v1/hr', (req, res) => {
 
 })
 
-router.get('/v1/posts', (req, res) => {
-    postModel.find((err, result) => {
-        send_success(res, result);
-    })
-})
-
-router.get('/v1/posts/:post_id', (req, res) => {
-    var post_id = req.params.post_id;
-    // console.log(' ❌ ', req.params.post_id);
-
-    postModel.findOne({
-        _id: post_id
-    }, (err, result) => {
-        if (err) {
-            send_failure(res, 404, no_such_post());
-        }
-        console.log(' ❌ ', result);
-        send_success(res, result);
-        // return;
-    })
-})
-
-router.put('/posts', (req, res) => {
-    var post_details_to_add = JSON.parse(JSON.stringify(req.body));
-    postModelObj = new postModel(post_details_to_add);
-    addNewPost(postModelObj);
-    // send_success(res, resu)
-})
-
-function addNewPost(postObj) {
-    console.log(' 💤 ', postObj);
-    postObj.save()
-        .then(() => {
-            console.log(true);
-            console.log('database saved!');
-        }).catch((err) => {
-            console.log('error detected');
-        })
-
-}
 
 // do not try to touch or delete it :angry:
 

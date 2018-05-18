@@ -1,47 +1,76 @@
 var mongoose=require('mongoose');
 var router = require('express').Router();
 var Applicant = mongoose.model('applicantModel');
-var mail=require('./sendMail');
 const sgMail = require('@sendgrid/mail');
-// var template=require('../../templates/signup');
-// module.exports={
-//        signupApplicantNotification:(req)=>{
-//         let emailData={
-//             to:req,
-//             from:'lokaanvesh2@gmail.com',
-//             subject:'welcome JobSeeker',
-//             htmlContent:'../../templates/signup.html'
-//         };
-//          mail.sendMail(emailData);
-//         },
-//         signupHrNotification:(req)=>{
-//             let emailData={
-//                 to:req,
-//                 from:'chintareddy.sudhakarreddy@gmail.com',
-//                 subject:'welcome HR ',
-//                 htmlContent:'../../templates/signup.html'
-//             };
-//              mail.sendMail(emailData);
-//             }
 
-// }
+    signupNotification=function (req,res){
+        console.log('email to sender',req);
+        sgMail.setApiKey('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');        const msg = {
+            to:req,
+            from: 'chintareddy.sudhakarreddy@gmail.com',
+            subject: 'Jobnut signup greetings',
+            html:`<h1>Hi user,</h1>
+                   <h2>You are at right place we will provide good job offers</h2>`
+          };
+        sgMail.send(msg, (err) => {
+            if (!err)
+            console.log('mail sent successfully');
+            else
+            console.log(' mail error');
+        });
+    }
+    jobApplyNotification=function (req,res){
+        console.log('email to sender',req);
+        sgMail.setApiKey('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');        const msg = {
+            to:req,
+            from: 'chintareddy.sudhakarreddy@gmail.com',
+            subject: 'Jobnut apply notification',
+            html:`<h1>Hi user,</h1>
+                   <h2> user application was submitted successfully job provider will contact user for further process.</h2>`
+          };
+        sgMail.send(msg, (err) => {
+            if (!err)
+            console.log('mail sent successfully');
+            else
+            console.log('mail error');
+        });
+    }
+    signupHrNotification=function (req,res){
+        console.log('email to sender',req);
+        sgMail.setApiKey('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');        const msg = {
+            to:req,
+            from: 'chintareddy.sudhakarreddy@gmail.com',
+            subject: 'Jobnut signup grettings for HR',
+            html:`<h1>Hi Job Provider,</h1>
+                   <h2>Please upload some job offers in your account where user will apply for it</h2>`
+          };
+        sgMail.send(msg, (err) => {
+            if (!err)
+            console.log('mail sent successfully');
+            else
+            console.log('mail error');
+        });
+    }
+    passwordUpdateNotification=function (req,res){
+        console.log('email to sender',req);
+        sgMail.setApiKey('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');        const msg = {
+            to:req,
+            from: 'krishnasai511@gmail.com',
+            subject: 'Jobnut password updated',
+            html:`<h1>Hello user,</h1>
+                   <h2>As per your request your password was updated successfuly</h2>`
+          };
+        sgMail.send(msg, (err) => {
+            if (!err)
+            console.log('mail sent successfully');
+            else
+            console.log('mail error');
+        });
+    }
+    module.exports={
+        passwordUpdateNotification,
+        signupHrNotification,
+        jobApplyNotification,
+        signupNotification
 
-
-// router.get('/forget',(req,res)=>{
-//     sgMail.setApiKey('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');
-//     const msg = {
-//         to:'lokaanvesh2@gmail.com',
-//         from: 'chintareddy.sudhakarreddy@gmail.com',
-//         subject: 'Hello user',
-//         html:'../../templates/signup.html'
-//       };
-//     sgMail.send(msg, (err) => {
-//         if (!err)
-//         res.send('mail sent successfully');
-//         else
-//         res.send('error');
-//     });
-// return true;
-// });
-
-// module.exports=router;
+    };
