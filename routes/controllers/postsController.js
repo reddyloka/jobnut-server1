@@ -25,7 +25,6 @@ function send_success(res, data, message) {
     res.end(JSON.stringify(output) + "\n");
 }
 
-
 // shortlist applicant by HR
 exports.shortlist_applicant = async (req, res, next) => {
     console.log("upadted AAAAAAAAAAA", req.query.id)

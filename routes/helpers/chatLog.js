@@ -31,7 +31,7 @@ module.exports = {
           const applicant = await Applicant.findOne({
             email: obj.sender
           }).populate('chats._from').populate('chats._to');
-          console.log('Consoled HR', JSON.stringify(applicant.chats));
+          // console.log('Consoled HR', JSON.stringify(applicant.chats));
           console.log('hello');
           if (!applicant) {
 

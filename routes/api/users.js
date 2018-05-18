@@ -16,6 +16,8 @@ var notifyFunctions = require('./notify');
 var upload = multer({ dest: 'uploads/'});
 router.use(express.static(__dirname + '/../static'));
 
+const imagePath = path.join(__dirname, '../../static/images/');
+
 router.get('/hrs', async (req, res, next) => {
       console.log('data from hr',req.query.id)
     const user = await Hr.findById(req.query.id)
@@ -490,8 +492,8 @@ router.post('/user/upload-profile', upload.any(), async (req, res, next) => {
             send_failure(404, 'no such user!');
         }
         console.log('user is : ', user.email, user.profile_photo)
-        if (fs.existsSync('D:/Users/mitta/Desktop/Jobnut/jobnut-server/static/images/' + user.profile_photo)) {
-            fs.unlinkSync('D:/Users/mitta/Desktop/Jobnut/jobnut-server/static/images/' + user.profile_photo);
+        if (fs.existsSync(imagePath + user.profile_photo)) {
+            fs.unlinkSync(imagePath + user.profile_photo);
         }
         user.profile_photo = null;
 
@@ -524,7 +526,7 @@ router.post('/user/upload-profile', upload.any(), async (req, res, next) => {
             // return;
         }
 
-        console.log(fs.renameSync(file.path, 'D:/Users/mitta/Desktop/Jobnut/jobnut-server/static/images/' + final_fn));
+        console.log(fs.renameSync(file.path, imagePath + final_fn));
         if(fs.existsSync(file.path)){
             fs.unlinkSync(file.path);
         }

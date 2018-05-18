@@ -26,11 +26,17 @@ app.use(bodyParser.json());
 // app.use(session({ secret: 'conduit', cookie: { maxAge: 60000 }, resave: false, saveUninitialized: false  }));
 
 if (!isProduction) {
-//   app.use(errorhandler());
+  app.use(errorhandler());
 }
 
 if(isProduction){
-  // mongoose.connect(process.env.MONGODB_URI);
+  mongoose.connect('mongodb://anvesh:test@ds133856.mlab.com:33856/jobnut-server',(err,db)=>{
+    if(!err)
+    {
+      console.log('Database connected successfully');
+    }
+  });
+  mongoose.set('debug', true);
 } else {
   mongoose.connect('mongodb://anvesh:test@ds133856.mlab.com:33856/jobnut-server',(err,db)=>{
     if(!err)

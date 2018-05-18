@@ -3,7 +3,10 @@ var router = require('express').Router();
 var Post = mongoose.model('postModel');
 const Hr = mongoose.model('hrModel');
 var auth = require('../auth');
+
 // const { authenticate } = require('../../_middleware/check-auth');
+
+
 
 function send_failure(code, message) {
     return status(code).json({
@@ -36,9 +39,7 @@ router.get('/all/post', async (req, res, next) => {
         if (!data) {
             return res.sendStatus(401);
         }
-        return res.json({
-            data: data
-        });
+        return res.json(data);
     }
     catch (error) {
         console.log('Error', error);
@@ -56,11 +57,7 @@ router.put('/update', async (req, res, next) => {
         }
         console.log(data);
         
-        return res.json(
-            {
-                data: data
-            }
-        )
+        return res.json(data);
     }
     catch (error) {
         console.log('Error', error);
@@ -76,9 +73,7 @@ router.get('/:post_id', async (req, res, next) => {
         if (!user) {
             return res.sendStatus(401);
         }
-        return res.json({
-            data: user
-        });
+        return res.json(user);
     }
     catch (error) {
         console.log('Error', error);
@@ -93,9 +88,7 @@ router.get('/', auth ,(req, res, next) => {
             if (!user) {
                 return res.sendStatus(401);
             }
-            return res.json({
-                data: user
-            });
+            return res.json(user);
         }).catch(next);
     // }
 });
@@ -156,9 +149,7 @@ router.get('/', async (req, res, next) => {
         if (!user) {
             return res.sendStatus(401);
         }
-        return res.json({
-            data: user
-        });
+        return res.json(user);
     } catch (error) {
         console.log('Error', error);
     }
@@ -167,9 +158,7 @@ router.get('/', async (req, res, next) => {
 router.put('/deleteHrPost',async(req,res)=>{
     console.log('id',req.query.id);
   const data=await Post.findByIdAndRemove(req.query.id);
-  return res.json({
-      data:data
-  });
+  return res.json(data);
 });
 
 module.exports = router;
