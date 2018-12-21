@@ -18,6 +18,10 @@ router.use(express.static(__dirname + '/../static'));
 
 const imagePath = path.join(__dirname, '../../static/images/');
 
+router.get('/ready',(req,res)=>{
+    res.json({success:true,meassage: "server started successfuly.....................................!"})
+})
+
 router.get('/hrs', async (req, res, next) => {
       console.log('data from hr',req.query.id)
     const user = await Hr.findById(req.query.id)
